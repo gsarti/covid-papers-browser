@@ -1,0 +1,7 @@
+transformers
+sentence-transformers
+torch
+tqdm
+scipy
+numpy
+scikit-learn
