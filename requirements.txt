@@ -5,3 +5,5 @@ tqdm
 scipy
 numpy
 scikit-learn
+prettytable
+termcolor

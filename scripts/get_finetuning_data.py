@@ -6,7 +6,7 @@ import os
 folder_path = 'data'
 print('Beginning download of datasets')
 
-datasets = ['AllNLI.zip', 'stsbenchmark.zip', 'wikipedia-sections-triplets.zip']
+datasets = ['AllNLI.zip']
 server = "https://public.ukp.informatik.tu-darmstadt.de/reimers/sentence-transformers/datasets/"
 
 for dataset in datasets:
