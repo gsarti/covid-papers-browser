@@ -133,12 +133,6 @@ if __name__ == '__main__':
             embeddings = pickle.load(file)
 
     while True:
-        query = input('Ask your question: ')
+        query = input('\nAsk your question: ')
         results = ask_question(query, model, corpus, embeddings)
-        print('\n')
         show_answers(results)
-
-
-
-
-
