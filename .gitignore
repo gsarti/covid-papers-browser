@@ -8,6 +8,4 @@ cached*
 pytorch_model.bin
 
 data/
-
-notebooks/
-
+!data/README.md

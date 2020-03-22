@@ -21,7 +21,7 @@ logging.basicConfig(format='%(asctime)s - %(message)s',
 
 # Read the dataset
 model_name = 'models/scibert'
-batch_size = 32
+batch_size = 64
 nli_reader = NLIDataReader('data/AllNLI')
 sts_reader = STSDataReader('data/stsbenchmark')
 train_num_labels = nli_reader.get_num_labels()
@@ -55,7 +55,7 @@ dev_dataloader = DataLoader(dev_data, shuffle=False, batch_size=batch_size)
 evaluator = EmbeddingSimilarityEvaluator(dev_dataloader)
 
 # Configure the training
-num_epochs = 1
+num_epochs = 2
 
 warmup_steps = math.ceil(len(train_dataloader) * num_epochs / batch_size * 0.1) #10% of train data for warm-up
 logging.info("Warmup-steps: {}".format(warmup_steps))

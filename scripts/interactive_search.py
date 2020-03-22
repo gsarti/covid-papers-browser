@@ -12,16 +12,22 @@ import pandas as pd
 import scipy
 from sentence_transformers import SentenceTransformer
 
-COVID_ASCII = """
-    ================================================================================
-      _____           _     _       __  ___    ____                                  
-     / ____|         (_)   | |     /_ |/ _ \  |  _ \                                 
-    | |     _____   ___  __| |______| | (_) | | |_) |_ __ _____      _____  ___ _ __ 
-    | |    / _ \ \ / / |/ _` |______| |\__, | |  _ <| '__/ _ \ \ /\ / / __|/ _ \ '__|
-    | |___| (_) \ V /| | (_| |      | |  / /  | |_) | | | (_) \ V  V /\__ \  __/ |   
-     \_____\___/ \_/ |_|\__,_|      |_| /_/   |____/|_|  \___/ \_/\_/ |___/\___|_|   
+COVID_BROWSER_ASCII = """
+================================================================================
+  _____           _     _      __  ___    ____                                  
+ / ____|         (_)   | |    /_ |/ _ \  |  _ \                                 
+| |     _____   ___  __| | ___ | | (_) | | |_) |_ __ _____      _____  ___ _ __ 
+| |    / _ \ \ / / |/ _` ||___|| |\__, | |  _ <| '__/ _ \ \ /\ / / __|/ _ \ '__|
+| |___| (_) \ V /| | (_| |     | |  / /  | |_) | | | (_) \ V  V /\__ \  __/ |   
+ \_____\___/ \_/ |_|\__,_|     |_| /_/   |____/|_|  \___/ \_/\_/ |___/\___|_|   
+=================================================================================
+"""
 
-    =================================================================================
+COVID_BROWSER_INTRO = """
+This demo uses a state-of-the-art language model trained on scientific papers to
+search passages matching user-defined queries inside the COVID-19 Open Research
+Dataset. Ask something like 'Is smoking a risk factor for Covid-19?' to retrieve
+relevant abstracts.\n
 """
 
 BIORXIV_PATH = 'data/biorxiv_medrxiv/biorxiv_medrxiv/'
@@ -112,7 +118,8 @@ def show_answers(results):
 
 if __name__ == '__main__':
     os.system('cls' if os.name == 'nt' else 'clear')
-    print(COVID_ASCII)
+    print(COVID_BROWSER_ASCII)
+    print(COVID_BROWSER_INTRO)
     if not os.path.exists(CORPUS_PATH):
         print("Caching the corpus for future use...")
         corpus = cache_corpus()

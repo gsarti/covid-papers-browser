@@ -6,8 +6,11 @@ import os
 folder_path = 'data'
 print('Beginning download of datasets')
 
-datasets = ['AllNLI.zip']
+datasets = ['AllNLI.zip', 'stsbenchmark.zip']
 server = "https://public.ukp.informatik.tu-darmstadt.de/reimers/sentence-transformers/datasets/"
+
+if not os.path.exists(folder_path):
+    os.mkdir(folder_path)
 
 for dataset in datasets:
     print("Download", dataset)
