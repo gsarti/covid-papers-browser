@@ -1,4 +1,4 @@
-# Covid-19 Browser: Browse Scientific Covid-19 & SARS-CoV-2 Articles with SciBERT
+# Covid-19 Browser: Browse Scientific Articles about Covid-19 & SARS-CoV-2 with SciBERT-NLI
 
 **Covid-19 Browser** is an interactive experimental tool leveraging a state-of-the-art language model to search relevant content inside the [COVID-19 Open Research Dataset (CORD-19)](https://pages.semanticscholar.org/coronavirus-research) recently published by the White House and its research partners. The dataset contains over 44,000 scholarly articles about COVID-19, SARS-CoV-2 and related coronaviruses.
 
