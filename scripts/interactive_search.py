@@ -106,6 +106,7 @@ def show_answers(results):
             text,
             score
         ])
+    print('\n')
     print(str(table))
     print('\n')
 
