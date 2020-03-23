@@ -1,4 +1,9 @@
 """
+
+Adapted from  the original sentence-transformers script:
+
+https://github.com/UKPLab/sentence-transformers/blob/master/examples/training_nli_bert.py
+
 The system trains SciBERT on the SNLI + MultiNLI (AllNLI) dataset
 with softmax loss function. At every 1000 training steps, the model is evaluated on the
 STS benchmark dataset
@@ -71,14 +76,7 @@ model.fit(train_objectives=[(train_dataloader, train_loss)],
           output_path=model_save_path
           )
 
-
-
-##############################################################################
-#
 # Load the stored model and evaluate its performance on STS benchmark dataset
-#
-##############################################################################
-
 model = SentenceTransformer(model_save_path)
 test_data = SentencesDataset(examples=sts_reader.get_examples("sts-test.csv"), model=model)
 test_dataloader = DataLoader(test_data, shuffle=False, batch_size=batch_size)

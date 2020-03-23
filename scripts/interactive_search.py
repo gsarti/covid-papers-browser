@@ -85,6 +85,9 @@ def cache_corpus(mode='CSV'):
 
 
 def ask_question(query, model, corpus, corpus_embed, top_k=5):
+    """
+    Adapted from https://www.kaggle.com/dattaraj/risks-of-covid-19-ai-driven-q-a
+    """
     queries = [query]
     query_embeds = model.encode(queries, show_progress_bar=False)
     for query, query_embed in zip(queries, query_embeds):

@@ -1,4 +1,10 @@
 
+"""
+Adapted from the original sentence-transformers script:
+
+https://github.com/UKPLab/sentence-transformers/blob/master/examples/datasets/get_data.py
+"""
+
 import urllib.request
 import zipfile
 import os

@@ -1,5 +1,6 @@
 import os
 import argparse
+from shutil import rmtree
 from transformers import AutoTokenizer, AutoModel
 from sentence_transformers import models, SentenceTransformer
 
@@ -38,7 +39,7 @@ if __name__ == "__main__":
                                pooling_mode_cls_token=False,
                                pooling_mode_max_tokens=False)
         model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
-        os.rmtree(path)
+        shutil.rmtree(path)
         model.save(path)
         print('SciBERT SentenceTransformer model available in', path)
     else:
