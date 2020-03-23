@@ -137,7 +137,7 @@ if __name__ == '__main__':
         print("Computing and caching model embeddings for future use...")
         embeddings = model.encode(corpus, show_progress_bar=True)
         with open(EMBEDDINGS_PATH, 'wb') as file:
-            pickle.dump(corpus, file)
+            pickle.dump(embeddings, file)
     else:
         print("Loading model embeddings from", EMBEDDINGS_PATH, '...')
         with open(EMBEDDINGS_PATH, 'rb') as file:
