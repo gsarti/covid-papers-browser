@@ -51,7 +51,6 @@ if __name__ == "__main__":
     model = AutoModel.from_pretrained(MODELS_PRETRAINED[args.model])
     model.save_pretrained(path)
     tokenizer.save_pretrained(path)
-    print(f'Model {args.model} available in', path)
     if args.model in MODELS_FINETUNED.keys(): # Build the SentenceTransformer directly
         word_embedding_model = models.BERT(
             path,
@@ -63,5 +62,6 @@ if __name__ == "__main__":
                                pooling_mode_cls_token=False,
                                pooling_mode_max_tokens=False)
         model = SentenceTransformer(modules=[word_embedding_model, pooling_model])
-        shutil.rmtree(path)
+        rmtree(path)
         model.save(path)
+    print(f'Model {args.model} available in', path)
