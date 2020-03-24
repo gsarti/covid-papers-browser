@@ -4,7 +4,7 @@ Adapted from  the original sentence-transformers script:
 
 https://github.com/UKPLab/sentence-transformers/blob/master/examples/training_nli_bert.py
 
-The system trains SciBERT on the SNLI + MultiNLI (AllNLI) dataset
+The system trains a model on the SNLI + MultiNLI (AllNLI) dataset
 with softmax loss function. At every 1000 training steps, the model is evaluated on the
 STS benchmark dataset
 """
