@@ -16,6 +16,8 @@ MODELS_FINETUNED = {
     'biobert-nli': 'gsarti/biobert-nli',
 }
 
+MODELS = {**MODELS_PRETRAINED, **MODELS_FINETUNED}
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -47,8 +49,8 @@ if __name__ == "__main__":
         raise AttributeError("Model should be selected in the list: " + 
             ", ".join(list(MODELS_PRETRAINED) + list(MODELS_FINETUNED))
         )
-    tokenizer = AutoTokenizer.from_pretrained(MODELS_PRETRAINED[args.model])
-    model = AutoModel.from_pretrained(MODELS_PRETRAINED[args.model])
+    tokenizer = AutoTokenizer.from_pretrained(MODELS[args.model])
+    model = AutoModel.from_pretrained(MODELS[args.model])
     model.save_pretrained(path)
     tokenizer.save_pretrained(path)
     if args.model in MODELS_FINETUNED.keys(): # Build the SentenceTransformer directly
