@@ -1,4 +1,4 @@
-# Covid-19 Browser: Browse Covid-19 & SARS-CoV-2 Scientific Articles with SciBERT-NLI and BioBERT-NLI 🦠 📖
+# Covid-19 Semantic Browser: Browse Covid-19 & SARS-CoV-2 Scientific Papers with Transformers 🦠 📖
 
 **Covid-19 Browser** is an interactive experimental tool leveraging a state-of-the-art language model to search relevant content inside the [COVID-19 Open Research Dataset (CORD-19)](https://pages.semanticscholar.org/coronavirus-research) recently published by the White House and its research partners. The dataset contains over 44,000 scholarly articles about COVID-19, SARS-CoV-2 and related coronaviruses.
 
@@ -8,13 +8,15 @@ Various models already fine-tuned on Natural Language Inference are available to
 
 - **[`biobert-nli`](https://huggingface.co/gsarti/biobert-nli)**, a fine-tuned version of [BioBERT](https://github.com/dmis-lab/biobert) by J. Lee et al. [2]
 
+- **[`covidbert-nli`](https://huggingface.co/gsarti/covidbert-nli)**, a fine-tuned version of [CovidBERT](https://huggingface.co/deepset/covid_bert_base) by DeepSet.
+
 Both models are trained on [SNLI](https://nlp.stanford.edu/projects/snli/) [3] and [MultiNLI](https://www.nyu.edu/projects/bowman/multinli/) [4] using the [`sentence-transformers` library](https://github.com/UKPLab/sentence-transformers/) [5] to produce universal sentence embeddings [6]. Embeddings are subsequently used to perform semantic search on CORD-19.
 
 Currently supported operations are:
 
 - Browse paper abstract with interactive queries.
 
-- Reproduce SciBERT-NLI and BioBERT-NLI training results.
+- Reproduce SciBERT-NLI, BioBERT-NLI and CovidBERT-NLI training results.
 
 ## Setup
 
@@ -48,7 +50,7 @@ Use the interactive demo as follows:
 
 ## Reproducing the SciBERT-NLI and BioBERT-NLI Training
 
-First, download SciBERT or BioBERT from HuggingFace's cloud repository.
+First, download a pretrained model from HuggingFace's cloud repository.
 
 ```shell
 python scripts/download_model.py --model scibert

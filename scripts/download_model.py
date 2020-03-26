@@ -9,11 +9,13 @@ MODELS_PATH = "models"
 MODELS_PRETRAINED = {
     'scibert': 'allenai/scibert_scivocab_cased',
     'biobert': 'monologg/biobert_v1.1_pubmed',
+    'covidbert': ' deepset/covid_bert_base',
 }
 
 MODELS_FINETUNED = {
     'scibert-nli': 'gsarti/scibert-nli',
     'biobert-nli': 'gsarti/biobert-nli',
+    'covidbert-nli': 'gsarti/covidbert-nli'
 }
 
 MODELS = {**MODELS_PRETRAINED, **MODELS_FINETUNED}
