@@ -22,15 +22,16 @@ def load_sentence_transformer(
         )
     return SentenceTransformer(modules=[word_embedding_model, pooling_model])
 
-def match_query_paragraphs(
+
+def match_query(
     query: str,
     model: SentenceTransformer,
-    idx: list,
+    corpus: list,
     corpus_embed: list,
-    top_k: int = 5):
+    top_k: int = 5) -> list:
     """ Matches query and paragraph embeddings, returning top scoring paragraphs ids and scores """
     query_embed = model.encode([query], show_progress_bar=False)[0].reshape(1,-1)
     distances = 1 - cdist(query_embed, corpus_embed, "cosine")
-    results = zip(idx, distances.reshape(-1,1))
+    results = zip(corpus, distances.reshape(-1,1))
     results = sorted(results, key=lambda x: x[1], reverse=True)
     return results[:top_k]
