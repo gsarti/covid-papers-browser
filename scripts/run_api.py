@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 import numpy as np
 from flask import Flask, request, json
 from bson.objectid import ObjectId
@@ -7,18 +8,53 @@ from flask_pymongo import PyMongo
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'src'))
 
-from covid_browser import load_sentence_transformer, match_query_paragraphs
+from covid_browser import load_sentence_transformer, match_query, PaperOverview, PaperDetails
 
-app = Flask(__name__)
-app.config["MONGO_URI"] = "mongodb://localhost:27017/coviddb"
-mongo = PyMongo(app)
-col = mongo.db.cord19scibert
-
-indices, embeddings = zip(
-    *[(x['_id'], np.array(x['title_abstract_embeddings'])) 
-    for x in col.find({}, {'title_abstract_embeddings':1})]
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--db_name", 
+    default="coviddb", 
+    type=str, 
+    required=False,
+    help="Mongo database name."
 )
-indices, embeddings = list(indices), list(embeddings)
+parser.add_argument(
+    "--collection_name", 
+    default="cord19scibert", 
+    type=str, 
+    required=False,
+    help="Mongo collection name."
+)
+parser.add_argument(
+    "--model_name", 
+    default="gsarti/scibert-nli", 
+    type=str, 
+    required=False,
+    help="One among the models supported by HuggingFace AutoModel (e.g. `gsarti/scibert-nli`)"
+)
+args = parser.parse_args()
+app = Flask(__name__)
+app.config["MONGO_URI"] = f"mongodb://localhost:27017/{args.db_name}"
+mongo = PyMongo(app)
+col = mongo.db[args.collection_name]
+model = load_sentence_transformer(name=args.model_name)
+papers, embeddings = zip(*[
+    (
+        PaperOverview(x),
+        np.array(x['title_abstract_embeddings'])
+    ) 
+    for x in col.find({}, {
+        '_id': 0,
+        'cord_id': 1,
+        'title': 1,
+        'journal': 1,
+        'authors': 1,
+        'abstract': 1,
+        'title_abstract_embeddings': 1
+    })]
+)
+papers, embeddings = list(papers), list(embeddings)
+
 
 @app.route("/")
 @app.route("/help")
@@ -31,20 +67,8 @@ def get_papers():
     count = request.args.get('count', default = 10, type = int)
     query = request.args.get('query', default = None, type = str)
     if query is not None:
-        model = load_sentence_transformer()
-        match = match_query_paragraphs(query, model, indices, embeddings, count)
-        results = []
-        for x in col.find({'_id': {"$in": [id for id, score in match]}}):
-            results.append({
-                'id': str(x['_id']),
-                'title': x['title'],
-                'doi': x['doi'],
-                'source': x['source'],
-                'journal': x['journal'],
-                'authors': x['authors'],
-                'publish_time': x['publish_time'],
-                'abstract': x['abstract']
-            })
+        match = match_query(query, model, papers, embeddings, count)
+        results = [tup[0].as_dict() for tup in match]
         return json.jsonify(results)
     else:
         return 'A query must be specified!'
@@ -52,18 +76,15 @@ def get_papers():
 
 @app.route("/paper/<id>")
 def get_paper_by_id(id):
-    x = col.find_one({'_id': ObjectId(id)})
+    count = request.args.get('count', default = 10, type = int)
+    query = request.args.get('query', default = None, type = str)
+    x = col.find_one({'cord_id': id})
     if x is not None:
-        return {
-                    'id': str(x['_id']),
-                    'title': x['title'],
-                    'doi': x['doi'],
-                    'source': x['source'],
-                    'journal': x['journal'],
-                    'authors': x['authors'],
-                    'publish_time': x['publish_time'],
-                    'abstract': x['abstract']
-                }
+        paper = PaperDetails(x)
+        if query is not None:
+            match = match_query(query, model, paper.paragraphs, paper.paragraphs_embeddings, count)
+            paper.ranked_paragraphs = [tup[0] for tup in match]
+        return paper.as_dict()
     else:
         return 'Document not found!'
 

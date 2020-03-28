@@ -5,3 +5,6 @@ tqdm
 scipy
 numpy
 prettytable
+pandas
+pymongo
+flask_pymongo
