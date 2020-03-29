@@ -1,9 +1,6 @@
 """ Classes used as returns for API methods """
 
-import logging
 import numpy as np
-
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class PaperDatabaseEntry:
@@ -71,7 +68,7 @@ class PaperOverview:
         self.cord_id = dic['cord_id']
         self.title = dic['title']
         self.journal = dic['journal']
-        self.authors = dic['authors']
+        self.authors = ", ".join(dic['authors'])
         self.abstract = dic['abstract']
 
     def as_dict(self):
@@ -104,6 +101,11 @@ class PaperDetails(PaperOverview):
 
     def as_dict(self):
         return {
+            'cord_id': self.cord_id,
+            'title': self.title,
+            'abstract': self.abstract,
+            'authors': self.authors,
+            'journal': self.journal,
             'url': self.url,
             'source': self.source,
             'doin': self.doin,

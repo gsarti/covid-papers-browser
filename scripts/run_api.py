@@ -1,12 +1,14 @@
 import os
 import sys
 import argparse
+import warnings
 import numpy as np
-from flask import Flask, request, json
+from flask import Flask, request, json, render_template
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'src'))
+warnings.filterwarnings('ignore', category=FutureWarning)
 
 from covid_browser import load_sentence_transformer, match_query, PaperOverview, PaperDetails
 
@@ -33,7 +35,7 @@ parser.add_argument(
     help="One among the models supported by HuggingFace AutoModel (e.g. `gsarti/scibert-nli`)"
 )
 args = parser.parse_args()
-app = Flask(__name__)
+app = Flask(__name__, template_folder=os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'templates'))
 app.config["MONGO_URI"] = f"mongodb://localhost:27017/{args.db_name}"
 mongo = PyMongo(app)
 col = mongo.db[args.collection_name]
@@ -59,7 +61,7 @@ papers, embeddings = list(papers), list(embeddings)
 @app.route("/")
 @app.route("/help")
 def help():
-    return "Interrogate the Covid-19 Semantic Browser API as follows: TODO"
+    return render_template('help.html')
 
 
 @app.route("/paper")
@@ -71,7 +73,7 @@ def get_papers():
         results = [tup[0].as_dict() for tup in match]
         return json.jsonify(results)
     else:
-        return 'A query must be specified!'
+        return json.jsonify([])
 
 
 @app.route("/paper/<id>")
@@ -81,12 +83,12 @@ def get_paper_by_id(id):
     x = col.find_one({'cord_id': id})
     if x is not None:
         paper = PaperDetails(x)
-        if query is not None:
+        if query is not None and len(paper.paragraphs) > 0:
             match = match_query(query, model, paper.paragraphs, paper.paragraphs_embeddings, count)
             paper.ranked_paragraphs = [tup[0] for tup in match]
         return paper.as_dict()
     else:
-        return 'Document not found!'
+        return {}
 
 
 if __name__ == "__main__":
