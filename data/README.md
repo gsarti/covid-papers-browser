@@ -1,24 +1,8 @@
 # CORD19 Data
 
-Place here all the files and folders containing data about Covid-19 and SARS-CoV-v2 articles and papers. Data can be either downloaded from the [Kaggle CORD-19 Challenge](https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge/tasks) or using the following commands:
+Place here all the files and folders containing data about Covid-19 and SARS-CoV-v2 articles and papers. Data can be either downloaded from the [Kaggle CORD-19 Challenge](https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge/tasks) or by calling the script `download_data.sh`.
 
-```shell
-DATE=2020-03-20
-DATA_DIR=data
-
-wget https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/"${DATE}"/comm_use_subset.tar.gz -P "${DATA_DIR}"
-wget https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/"${DATE}"/noncomm_use_subset.tar.gz -P "${DATA_DIR}"
-wget https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/"${DATE}"/custom_license.tar.gz -P "${DATA_DIR}"
-wget https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/"${DATE}"/biorxiv_medrxiv.tar.gz -P "${DATA_DIR}"
-wget https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/"${DATE}"/metadata.csv -P "${DATA_DIR}"
-
-tar -zxvf "${DATA_DIR}"/comm_use_subset.tar.gz -C "${DATA_DIR}"
-tar -zxvf "${DATA_DIR}"/noncomm_use_subset.tar.gz -C "${DATA_DIR}"
-tar -zxvf "${DATA_DIR}"/custom_license.tar.gz -C "${DATA_DIR}"
-tar -zxvf "${DATA_DIR}"/biorxiv_medrxiv.tar.gz -C "${DATA_DIR}"
-```
-
-As of 20-03-2020, `metadata.csv` has a total of 44220 rows and contains the following information:
+As of 29-03-2020, `metadata.csv` has a total of 45774 rows and contains the following information:
 
 - `sha`: Unique identifier, only for files having the full text since it is the hash of the corresponding PDF.
 
@@ -42,72 +26,101 @@ As of 20-03-2020, `metadata.csv` has a total of 44220 rows and contains the foll
 
 - `full_text_file`: Subfolder in which the full text file is contained, under the name `{sha}.json`.
 
-JSON files inside subfolders are structured as follows:
+JSON files inside subfolders are divided as:
+
+- `biorxiv_medrxiv`: 1053 full text
+
+- `comm_use_subset`: 9315 full text
+
+- `custom_license`: 20657 full text
+
+- `noncomm_use_subset`: 2350 full text
+
+and are structured as follows:
 
 ```python
 {
-    'paper_id': 'Same as sha in metadata.csv',
-    'metadata': {
-            'title': 'Title of the paper',
-            'authors': [{
-                    'first': 'Author firstname',
-                    'middle': 'Author middle letter',
-                    'last': 'Author lastname',
-                    'suffix': 'e.g. Jr.',
-                    'affiliation': 'Academic/industrial affiliation',
-                    'email': 'Author email'
-            }, ...]
-    },
-    'abstract': [{
-            'text': 'Textual content of a part of the section',
-            'cite_spans': '?',
-            'ref_spans': '?',
-            'section': 'Name of the section'
-    }]
-    'body_text': [{
-            'text': 'Textual content of a part of the section',
-            'cite_spans': '?',
-            'ref_spans': '?',
-            'section': 'Name of the section'
-    }]
-    'bib_entries': {
-            'BIBREF0': {
-                    'ref_id': 'Reference id',
-                    'title': 'Title of the reference',
-                    'authors': [{
-                            'first': 'Author firstname',
-                            'middle': 'Author middle letter',
-                            'last': 'Author lastname',
-                            'suffix': 'e.g. Jr.'
-                    }, ...]
-                    'year': 'Year of publication',
-                    'venue': 'Venue of publication',
-                    'volume': 'Volume of publication',
-                    'issn': 'Issue number',
-                    'pages': 'Pages in which the publication can be found',
-                    'other_ids': 'Dict, all other info on reference'
-            }
-            'BIBREF1': {
-                    ...
-            }
+    "paper_id": <str>,                      # 40-character sha1 of the PDF
+    "metadata": {
+        "title": <str>,
+        "authors": [                        # list of author dicts, in order
+            {
+                "first": <str>,
+                "middle": <list of str>,
+                "last": <str>,
+                "suffix": <str>,
+                "affiliation": <dict>,
+                "email": <str>
+            },
             ...
-    }
-    'ref_entries': {
-            'FIGREF0': { # FIGREF, TABREF, etc.
-                    'text': 'Reference text description',
-                    'latex': 'Latex available for reference',
-                    'type': 'table, figure, etc.'
-            }
-            'TABREF0': {
+        ],
+        "abstract": [                       # list of paragraphs in the abstract
+            {
+                "text": <str>,
+                "cite_spans": [             # list of character indices of inline citations
+                                            # e.g. citation "[7]" occurs at positions 151-154 in "text"
+                                            #      linked to bibliography entry BIBREF3
+                    {
+                        "start": 151,
+                        "end": 154,
+                        "text": "[7]",
+                        "ref_id": "BIBREF3"
+                    },
                     ...
-            }
+                ],
+                "ref_spans": <list of dicts similar to cite_spans>,     # e.g. inline reference to "Table 1"
+                "section": "Abstract"
+            },
             ...
+        ],
+        "body_text": [                      # list of paragraphs in full body
+                                            # paragraph dicts look the same as above
+            {
+                "text": <str>,
+                "cite_spans": [],
+                "ref_spans": [],
+                "eq_spans": [],
+                "section": "Introduction"
+            },
+            ...
+            {
+                ...,
+                "section": "Conclusion"
+            }
+        ],
+        "bib_entries": {
+            "BIBREF0": {
+                "ref_id": <str>,
+                "title": <str>,
+                "authors": <list of dict>       # same structure as earlier,
+                                                # but without `affiliation` or `email`
+                "year": <int>,
+                "venue": <str>,
+                "volume": <str>,
+                "issn": <str>,
+                "pages": <str>,
+                "other_ids": {
+                    "DOI": [
+                        <str>
+                    ]
+                }
+            },
+            "BIBREF1": {},
+            ...
+            "BIBREF25": {}
+        },
+        "ref_entries":
+            "FIGREF0": {
+                "text": <str>,                  # figure caption text
+                "type": "figure"
+            },
+            ...
+            "TABREF13": {
+                "text": <str>,                  # table caption text
+                "type": "table"
+            }
+        },
+        "back_matter": <list of dict>           # same structure as body_text
     }
-    'back_matter': [{
-            'text': 'Textual content of a part of the section',
-            'cite_spans': '?',
-            'ref_spans': '?',
-            'section': 'Name of the section'
-    }]
 }
 ```
