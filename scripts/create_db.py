@@ -46,22 +46,26 @@ def create_db(
     data_path: str = 'data/metadata.csv',
     db_name: str = 'coviddb',
     collection_name: str = 'cord19scibert',
-    model_name: str = 'gsarti/scibert-nli') -> None:
+    model_name: str = 'gsarti/scibert-nli',
+    n_batches: int = 1) -> None:
     """ Creates a new Mongo database with entries from data_path, using model model_name """
     model = load_sentence_transformer(name=model_name)
     df = pd.read_csv(data_path)
     df = df.fillna('')
-    db_entries = []
-    for _, row in tqdm(df.iterrows()):
-        db_entry = create_db_entry(row, model)
-        # Only add entries with at least one between title and abstract to enable search
-        if len(db_entry.title_abstract_embeddings) > 0:
-            db_entries.append(db_entry.as_dict())
+    df_batches = np.array_split(df, n_batches)
     client = MongoClient()
     db = client[db_name]
     col = db[collection_name]
-    col.insert_many(db_entries)
-    logger.info(f'Done: {len(db_entries)} new.')
+    for batch in df_batches:
+        db_entries = []
+        for _, row in tqdm(batch.iterrows()):
+            db_entry = create_db_entry(row, model)
+            # Only add entries with at least one between title and abstract to enable search
+            if len(db_entry.title_abstract_embeddings) > 0:
+                db_entries.append(db_entry.as_dict())
+        col.insert_many(db_entries)
+        logger.info(f'Inserted {len(db_entries)} new entries.')
+    logger.info(f'Done. Inserted {len(df)} total new entries.')
 
 
 def update_db(
@@ -69,7 +73,8 @@ def update_db(
     data_path: str = 'data/metadata.csv',
     db_name: str = 'coviddb',
     collection_name: str = 'cord19scibert',
-    model_name: str = 'gsarti/scibert-nli') -> None:
+    model_name: str = 'gsarti/scibert-nli',
+    n_batches: int = 1) -> None:
     """ Updates the DB entries based on old_data_path dataframe with new ones based on
     data_path, inserting new items and updating the ones that are already present.
     """
@@ -84,29 +89,30 @@ def update_db(
             how='left', 
             indicator=True
         ).loc[lambda f: f['_merge']=='left_only']
-        db_entries = []
         logger.info(f'Total new or updated entries: {len(modified_new)}')
-        for _, row in tqdm(modified_new.iterrows()):
-            db_entry = create_db_entry(row, model)
-            # Only add entries with at least one between title and abstract to enable search
-            if len(db_entry.title_abstract_embeddings) > 0:
-                db_entries.append(db_entry.as_dict())
+        df_batches = np.array_split(modified_new, n_batches)
         client = MongoClient()
         db = client[db_name]
         col = db[collection_name]
-        new_elements = []
         replaced_count = 0
-        for entry in db_entries:
-            # Replace document if found, else it inserts it
-            val = col.find_one_and_replace(
-                {'cord_id': entry['cord_id']},
-                entry,
-                upsert=True
-            )
-            if val is not None:
-                replaced_count += 1
-        inserted_count = len(db_entries) - replaced_count
-        logger.info(f'Done: {replaced_count} modified, {inserted_count} new.')
+        for batch in df_batches:
+            db_entries = []
+            for _, row in tqdm(batch.iterrows()):
+                db_entry = create_db_entry(row, model)
+                # Only add entries with at least one between title and abstract to enable search
+                if len(db_entry.title_abstract_embeddings) > 0:
+                    db_entries.append(db_entry.as_dict())
+            for entry in db_entries:
+                # Replace document if found, else it inserts it
+                val = col.find_one_and_replace(
+                    {'cord_id': entry['cord_id']},
+                    entry,
+                    upsert=True
+                )
+                if val is not None:
+                    replaced_count += 1
+        inserted_count = len(modified_new) - replaced_count
+        logger.info(f'Done: {replaced_count} modified, {inserted_count} new entries.')
 
 
 if __name__ == '__main__':
@@ -156,6 +162,13 @@ if __name__ == '__main__':
         action="store_true",
         help="Updates an existing Mongo database."
     )
+    parser.add_argument(
+        "--n_batches", 
+        default=1,
+        type=int,
+        required=False,
+        help="The number of batches to use for creating/updating the database."
+    )
     args = parser.parse_args()
     if not (args.update != args.create): # XOR
         raise AttributeError('Exactly one among modes "create" and "update" must be selected.')
@@ -166,7 +179,8 @@ if __name__ == '__main__':
             data_path = args.data_path,
             db_name = args.db_name,
             collection_name = args.collection_name,
-            model_name = args.model_name
+            model_name = args.model_name,
+            batches = args.n_batches
         )
     elif args.update:
         update_db(
@@ -174,5 +188,6 @@ if __name__ == '__main__':
             data_path = args.data_path,
             db_name = args.db_name,
             collection_name = args.collection_name,
-            model_name = args.model_name
+            model_name = args.model_name,
+            batches = args.n_batches
         )
