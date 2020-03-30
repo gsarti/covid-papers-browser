@@ -8,3 +8,5 @@ prettytable
 pandas
 pymongo
 flask_pymongo
+spacy
+nltk

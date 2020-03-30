@@ -20,10 +20,12 @@ Currently supported operations are:
 
 ## Setup
 
-Python 3.6 or higher is required to run the code. First, install the required libraries with `pip`:
+Python 3.6 or higher is required to run the code. First, install the required libraries with `pip`, then download the `en_core_web_sm` language pack for spaCy and data for NLTK:
 
 ```shell
 pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+python -m nltk.downloader punkt
 ```
 
 ## Using the Browser
