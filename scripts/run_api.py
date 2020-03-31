@@ -144,12 +144,12 @@ def get_paper_by_id(id):
     count = request.args.get('count', default = 10, type = int)
     query = request.args.get('query', default = None, type = str)
     score = request.args.get('score', default = 0.0, type = float)
-    doc = nlp(query)
     x = details_col.find_one({'cord_id': id})
     if x is not None:
         paper = PaperDetails(x)
         scores, indices = [], []
         if query is not None and len(paper.paragraphs) > 0:
+            doc = nlp(query)
             match = match_query(query, model, paper.paragraphs, paper.paragraphs_embeddings)
             paper.ranked_paragraphs, scores = map(list, zip(*
                 [(p,s) for p,s in match if s > score][:count]
