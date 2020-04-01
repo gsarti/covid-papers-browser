@@ -8,6 +8,7 @@ from collections import Counter
 from flask import Flask, request, json, render_template
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
+from flask_cors import CORS
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'src'))
 warnings.filterwarnings('ignore', category=FutureWarning)
@@ -23,7 +24,7 @@ from covid_browser import (
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--db_name", 
-    default="coviddb", 
+    default="covid",
     type=str, 
     required=False,
     help="Mongo database name."
@@ -51,6 +52,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 app = Flask(__name__, template_folder=os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'templates'))
+CORS(app)
 app.config["MONGO_URI"] = f"mongodb://localhost:27017/{args.db_name}"
 mongo = PyMongo(app)
 overview_col = mongo.db[args.overview_collection_name]
@@ -93,48 +95,66 @@ def help():
 
 @app.route("/years")
 def get_years():
-    count = request.args.get('count', default = 10, type = int)
+    count = request.args.get('count', default = 1000, type = int)
     return json.jsonify(c_times.most_common(count))
 
 
 @app.route("/authors")
 def get_authors():
-    count = request.args.get('count', default = 10, type = int)
+    count = request.args.get('count', default = 1000, type = int)
     return json.jsonify(c_authors.most_common(count))
 
 
 @app.route("/journals")
 def get_journals():
-    count = request.args.get('count', default = 10, type = int)
+    count = request.args.get('count', default = 1000, type = int)
     return json.jsonify(c_journals.most_common(count))
 
 
 @app.route("/licenses")
 def get_licenses():
-    count = request.args.get('count', default = 10, type = int)
+    count = request.args.get('count', default = 1000, type = int)
     return json.jsonify(c_licenses.most_common(count))
 
 
-@app.route("/paper")
+@app.route("/paper", methods=['POST'])
 def get_papers():
-    count = request.args.get('count', default = 10, type = int)
-    query = request.args.get('query', default = None, type = str)
-    score = request.args.get('score', default = 0.0, type = float)
-    p_years = request.args.getlist('year')
-    p_authors = request.args.getlist('author')
-    p_journals = request.args.getlist('journal')
-    p_licenses = request.args.getlist('license')
+    print(request)
+    count = request.get_json().get('count')
+    if count is None:
+        count=10
+    query = request.get_json().get('query')
+    score = request.get_json().get('score')
+    if score is None:
+        score=0.0
+    p_years = request.get_json().get('year')
+    if p_years is None:
+        p_years=[]
+    p_authors = request.get_json().get('author')
+    if p_authors is None:
+        p_authors=[]
+    p_journals = request.get_json().get('journal')
+    if p_journals is None:
+        p_journals=[]
+    p_licenses = request.get_json().get('license')
+    if p_licenses is None:
+        p_licenses=[]
+    print(query)
     if query is not None:
         match = match_query(query, model, papers, embeddings)
         match = [(m,s) for m,s in match if s > score]
         if len(p_years) > 0:
-            match = [(m,s) for m,s in match if m.year in p_years]
+            match = [(m,s) for m,s in match if str(m.year) in [ str(p_year[0]) for p_year in p_years]]
         if len(p_authors) > 0:
+<<<<<<< HEAD
             match = [(m,s) for m,s in match if any(a in m.authors for a in [ p_author[0] for p_author in p_authors])]
+=======
+            match = [(m,s) for m,s in match if all(a in m.authors for a in [ p_author[0] for p_author in p_authors])]
+>>>>>>> api per recuperare anno, autore, journal, licenza e query. ATTENZIONE: sicuro di voler lasciare la ricerca per autore in AND? limite di autore, journal, year e licenza a 1000. ci vuole un pò di tempo per renderizzare le select. un limite inferiore rende il rendering veloce, ma un numero basso di autori potrebbe rendere il filtro superfluo. Che fare?
         if len(p_journals) > 0:
-            match = [(m,s) for m,s in match if m.journal in p_journals]
+            match = [(m,s) for m,s in match if m.journal in [p_journal[0] for p_journal in p_journals]]
         if len(p_licenses) > 0:
-            match = [(m,s) for m,s in match if m.license in p_licenses]
+            match = [(m,s) for m,s in match if m.license in [p_licence[0] for p_licence in p_licenses]]
         results = [paper.as_dict(score) for paper, score in match]
         return json.jsonify(results[:count])
     else:
@@ -166,4 +186,5 @@ def get_paper_by_id(id):
 
 
 if __name__ == "__main__":
+
     app.run(debug=True)

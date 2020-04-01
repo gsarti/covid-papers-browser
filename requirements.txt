@@ -11,4 +11,9 @@ pandas
 prettytable
 scipy
 spacy
+<<<<<<< HEAD
 sentence_transformers
+=======
+nltk
+flask_cors
+>>>>>>> api per recuperare anno, autore, journal, licenza e query. ATTENZIONE: sicuro di voler lasciare la ricerca per autore in AND? limite di autore, journal, year e licenza a 1000. ci vuole un pò di tempo per renderizzare le select. un limite inferiore rende il rendering veloce, ma un numero basso di autori potrebbe rendere il filtro superfluo. Che fare?
