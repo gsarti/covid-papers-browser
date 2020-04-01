@@ -241,11 +241,11 @@ app.controller('listdata',function($http,$scope,$timeout){
            }
         }).then(function successCallback(response) {
              console.log(response);
-             vm.articles=response.data;
+             vm.articles=response.data.data;
             
 
              //simila la restiuzione del numeroo totale degli articoli, utile solo in fase demo
-             vm.total_count = vm.articles.length;
+             vm.total_count = response.data.total;
              
              //simula la paginazione, utile solo in fase demo
              //vm.articles = vm.articles.slice((pageno-1)*vm.dinamicitemsPerPage, ((pageno-1)*vm.dinamicitemsPerPage)+vm.dinamicitemsPerPage);

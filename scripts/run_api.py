@@ -139,6 +139,9 @@ def get_papers():
     p_licenses = request.get_json().get('license')
     if p_licenses is None:
         p_licenses=[]
+    page = request.get_json().get('page')
+    if page is None:
+        page=1
     print(query)
     if query is not None:
         match = match_query(query, model, papers, embeddings)
@@ -156,7 +159,7 @@ def get_papers():
         if len(p_licenses) > 0:
             match = [(m,s) for m,s in match if m.license in [p_licence[0] for p_licence in p_licenses]]
         results = [paper.as_dict(score) for paper, score in match]
-        return json.jsonify(results[:count])
+        return json.jsonify({ "total": len(results), "data": results[count*(page-1):count*page]} )
     else:
         return json.jsonify([])
 
