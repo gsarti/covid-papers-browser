@@ -141,7 +141,7 @@ app.controller('listdata',function($http,$scope,$timeout){
 
     vm.articles = []; //declare an empty array
     vm.pageno = 1; // initialize page no to 1
-    vm.total_count = 0;
+    vm.total_count = 1;
     vm.dinamicitemsPerPage=10;
     vm.query="What is the effect od Covid-19 on pregnant women?";
     //vm.itemsPerPage = $scope.dinamicitemsPerPage; //this could be a dynamic value from a drop down
@@ -235,20 +235,20 @@ app.controller('listdata',function($http,$scope,$timeout){
             "year" : vm.year,
             "author" : vm.author,
             "journal" : vm.journal,
-            "license" : vm.license
-          }
+            "license" : vm.license,
+            "count" : vm.dinamicitemsPerPage,
+            "page": vm.pageno
+           }
         }).then(function successCallback(response) {
              console.log(response);
              vm.articles=response.data;
             
 
-
-
              //simila la restiuzione del numeroo totale degli articoli, utile solo in fase demo
              vm.total_count = vm.articles.length;
              
              //simula la paginazione, utile solo in fase demo
-             vm.articles = vm.articles.slice((pageno-1)*vm.dinamicitemsPerPage, ((pageno-1)*vm.dinamicitemsPerPage)+vm.dinamicitemsPerPage);
+             //vm.articles = vm.articles.slice((pageno-1)*vm.dinamicitemsPerPage, ((pageno-1)*vm.dinamicitemsPerPage)+vm.dinamicitemsPerPage);
 
              console.log("pageno",vm.pageno);
              console.log("dinamicitemsPerPage",vm.dinamicitemsPerPage);
