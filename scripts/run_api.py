@@ -164,12 +164,21 @@ def get_papers():
         return json.jsonify([])
 
 
-@app.route("/paper/<id>")
-def get_paper_by_id(id):
-    count = request.args.get('count', default = 10, type = int)
-    query = request.args.get('query', default = None, type = str)
-    score = request.args.get('score', default = 0.0, type = float)
-    x = details_col.find_one({'cord_id': id})
+@app.route("/singlearticle", methods=['POST'])
+def get_paper_by_id():
+    count = request.get_json().get('count')
+    if count is None:
+        count=1
+    query = request.get_json().get('query')
+
+    cord_id = request.get_json().get('cord_id')
+    if cord_id is None:
+        return {}
+
+    score = request.get_json().get('score')
+    if score is None:
+        score=0.0
+    x = details_col.find_one({'cord_id': cord_id})
     if x is not None:
         paper = PaperDetails(x)
         scores, indices = [], []

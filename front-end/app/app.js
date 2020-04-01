@@ -286,132 +286,66 @@ app.controller('listdata',function($http,$scope,$timeout){
        */
 
         event.preventDefault(); 
-        vm.articleid=articlecode;
+        vm.cord_id=articlecode;
 
         console.log("articleview");
         //cambio modalità grafica
         $(".articleview").show();
         $(".articlelist").hide();
 
-        vm.article = {
-          "abstract": "An emerging disease is one infectious epidemic caused by a newly transmissible pathogen, which has either appeared for the first time or already existed in human populations, having the capacity to increase rapidly in incidence as well as geographic range. Adapting to human immune system, emerging diseases may trigger large-scale pandemic spreading, such as the transnational spreading of SARS, the global outbreak of A(H1N1), and the recent potential invasion of avian influenza A(H7N9). To study the dynamics mediating the transmission of emerging diseases, spatial epidemiology of networked metapopulation provides a valuable modeling framework, which takes spatially distributed factors into consideration. This review elaborates the latest progresses on the spatial metapopulation dynamics, discusses empirical and theoretical findings that verify the validity of networked metapopulations, and the application in evaluating the effectiveness of disease intervention strategies as well.", 
-          "authors": [
-            "Lin WANG", 
-            "Xiang Li"
-          ], 
-          "bibliography": [], 
-          "cord_id": "i9tbix2v", 
-          "doin": "10.1101/003889", 
-          "journal": "", 
-          "license": "biorxiv", 
-          "microsoft_id": "", 
-          "pmc_id": "", 
-          "publish_time": "2014-06-04", 
-          "pubmed_id": "", 
-          "ranked_paragraphs": [
-            {
-              "score": 0.55, 
-              "section": "Figure", 
-              "spans": [], 
-              "text": "Color online) Illustration of the individual-network frame of the networked metapopulation model. a The model is composed of a network of subpopulations. The disease transmission among subpopulations stems from the mobility of infected individuals. b Each subpopulation refers to a location, in which a population of individuals interplays according to the compartment rule (e.g., SIR) that induces local disease outbreaks. Individuals are transferred among subpopulations via mobility networks."
-            }, 
-            {
-              "score": 0.53, 
-              "section": "Two scales of dynamics: Recent progress", 
-              "spans": [], 
-              "text": "As stated in Section 2, the networked metapopulation model is constructed with the individual-network frame, where the individuals are organized into social units (e.g., villages, towns, cities) defined as subpopulations, which are connected by transportation networks that identify the mobility routes. The disease prevails inside each subpopulation due to interpersonal contacts, and is transmitted among subpopulations through the mobility of infected individuals. Typically, the model is comprised of two scales of dynamics: (i) disease invasion among different subpopulations; (ii) disease reaction within each subpopulation. Recent progresses on these two aspects are specified here."
-            }, 
-            {
-              "score": 0.53, 
-              "section": "Networked metapopulation.", 
-              "spans": [
-                [
-                  155, 
-                  425
-                ], 
-                [
-                  0, 
-                  154
-                ]
-              ], 
-              "text": "Spatial distribution of populations and human mobility among connected locations are the pivotal elements mediating the transmission of pandemic diseases. To introduce spatially distributed factors into modeling substrates, it is intuitive to generalize the network model by defining each node as a subpopulation that has a specific location, in which a population of individuals interplays according to the compartment rule. People are also permitted to transfer among subpopulations through mobility networks. This individualnetwork frame organizes the entire system into networked populations, leading to an important class of model in modern epidemiology, namely, the networked metapopulation. Figure 2 illustrates the basic modeling structure."
-            }, 
-            {
-              "score": 0.49, 
-              "section": "Abstract", 
-              "spans": [
-                [
-                  491, 
-                  712
-                ], 
-                [
-                  713, 
-                  993
-                ]
-              ], 
-              "text": "An emerging disease is one infectious epidemic caused by a newly transmissible pathogen, which has either appeared for the first time or already existed in human populations, having the capacity to increase rapidly in incidence as well as geographic range. Adapting to human immune system, emerging diseases may trigger large-scale pandemic spreading, such as the transnational spreading of SARS, the global outbreak of A(H1N1), and the recent potential invasion of avian influenza A(H7N9). To study the dynamics mediating the transmission of emerging diseases, spatial epidemiology of networked metapopulation provides a valuable modeling framework, which takes spatially distributed factors into consideration. This review elaborates the latest progresses on the spatial metapopulation dynamics, discusses empirical and theoretical findings that verify the validity of networked metapopulations, and the application in evaluating the effectiveness of disease intervention strategies as well."
-            }, 
-            {
-              "score": 0.49, 
-              "section": "Networked metapopulation.", 
-              "spans": [
-                [
-                  286, 
-                  564
-                ], 
-                [
-                  0, 
-                  285
-                ]
-              ], 
-              "text": "It is not convincing to describe the large-scale spatial pandemic spreading by directly following the routine of network epidemiology, since the network perspective still concerns the epidemic outbreak in a single population, despite considering the connectivity structure among hosts. This can hardly capture the key features of spatial transmission of infectious diseases: epidemics prevails inside separate locations such as cities, each of which can be regarded as a pop-ulation, and is transmitted among populations through the travel of infected individuals."
-            }, 
-            {
-              "score": 0.48, 
-              "section": "Intra-subpopulation contagion.", 
-              "spans": [], 
-              "text": "Note that the characteristic contact rate might vary evidently in different subpopulations. As illustrated by empirical studies [122, 123] , in reality, location-specific factors are the potential drivers resulting in a substantial variation of disease incidences between populations. Inspired by this finding, Wang et al. [124, 125] introduced two categories of location-specific human contact patterns into a phenomenological reaction-commuting metapopulation model. A simple destination-driven scenario is considered first, where individual contact features are determined by the visited locations. Since the residence and the destination can be distinguished by the commuting mobility, an origin-driven scenario is also introduced, where the contacts of individuals are relevant to their subpopulations of residence. Figures 4(a) -(b) illustrate the modeling structures of these two scenarios."
-            }, 
-            {
-              "score": 0.48, 
-              "section": "Conclusions & outlooks", 
-              "spans": [
-                [
-                  78, 
-                  261
-                ]
-              ], 
-              "text": "At the end of discussions, some open questions still deserve to be addressed. The development of the sophisticated computational techniques and the consideration of detailed human/population dynamics are quite important for the research of spatial epidemiology. However, it is also crucial to understand the fundamental principals governing the complex contagion phenomena [147] . In this regard, an interesting question poses itself, namely, whether it is possible to author/funder. All rights reserved. No reuse allowed without permission."
-            }, 
-            {
-              "score": 0.46, 
-              "section": "Inter-subpopulation invasion.", 
-              "spans": [
-                [
-                  176, 
-                  420
-                ]
-              ], 
-              "text": "As illustrated by Fig. 3 a, air traffic network acts as a major channel serving human long-range travels, which mediates the pandemic transmission on a large geographic scale. The epidemic dynamics occurred under this scenario is well characterized by the reaction-diffusion processes [88] , which are also widely applied to model phenomena as diverse as genetic drift, chemical reactions, and population evolution [2] ."
-            }, 
-            {
-              "score": 0.46, 
-              "section": "Inter-subpopulation invasion.", 
-              "spans": [], 
-              "text": "Human beings are intelligent. Their risk perception and adaptive abilities promote the active response to epidemic outbreaks, which might in turn alter the disease propagation [99] [100] [101] . Many works [102] [103] [104] [105] [106] [107] [108] [109] [110] [111] have investigated the effect of disease-behavior mutual feedback on compartment models as well as network epidemiology, and recent research topics also begin the generalization to deal with human behavior of mobility response. For example, [112, 113] analyzed the impact of self-initiated mobility on the invasion threshold, showing a counterintuitive phenomenon that the mobility change of avoiding infected locations with high prevalences enhances the disease spreading to the entire system."
-            }, 
-            {
-              "score": 0.44, 
-              "section": "Intra-subpopulation contagion.", 
-              "spans": [], 
-              "text": "Other types of human behavioral diversity have also been considered recently. Motivated by the evidence that the diversity of travel habits or trip durations might yield heterogeneity in the sojourn time spent at destinations, Poletto et al. [127] studied the impact of large fluctuations of visiting durations on the epidemic threshold, finding that the positively-correlated and the negatively-correlated degreebased staying durations lead to distinct invasion paths to global outbreaks. Based on the observation that the specific curing (recovery) condition depends on the available medical resources supplied by local health sectors, Shen et al. [128] studied the effect of degree-dependent curing rates, which demonstrates that an optimal intervention performance with the largest epidemic threshold is obtained by designing the heterogeneous distribution of curing rates as a superlinear mode. Since the epidemic spreading is also relevant to casual contacts during public gatherings, Cao et al. [129] introduced the rendezvous effect into a bipartite metapopulation network, and showed that the rendezvous-induced transmission accelerates the pandemic outbreaks."
-            }
-          ], 
-          "source": "biorxiv", 
-          "title": "Spatial epidemiology of networked metapopulation: An overview", 
-          "url": "https://doi.org/10.1101/003889", 
-          "who_id": ""
-        };
+        $http({
+          method: 'POST',
+          url: baseurl+'/singlearticle',
+          data:{ 
+            "query": vm.query,
+            "cord_id":vm.cord_id,
+            "count":1
+           }
+        }).then(function successCallback(response) {
+             console.log(response);
+             vm.article=response.data;
+
+             vm.paragraphs=[];
+
+             vm.article.ranked_paragraphs.forEach( function(paragraph){
+     
+               var start = 0;
+               var tokens=[];
+     
+               paragraph.spans.sort(function(a, b) {
+                 
+                 if (a[0] < b[0]) return -1;
+                 if (a[0] > b[0]) return 1;
+                 return 0;
+               }).forEach( function(span){
+     
+                
+                 if(start!=span[0]){
+                   var token={};
+                   token.text=paragraph.text.slice(start, span[0]);
+                   token.class="";
+                   tokens.push(token);
+                 }
+                 var token={};
+                 token.text=paragraph.text.slice(span[0], span[1]);
+                 token.class="paragraph";
+                 tokens.push(token);
+                 start=span[1]+1;
+     
+               });
+               var token={};
+               token.text=paragraph.text.slice(start,paragraph.text.length);
+               token.class="";
+               tokens.push(token);
+     
+               vm.paragraphs.push(tokens);
+     
+             });
+
+
+          }, function errorCallback(response) {
+            vm.article=[];
+          });
 
 
         console.log("getarticleData");
@@ -445,44 +379,7 @@ $$hashKey: "object:119"},
          
 
 */
-        vm.paragraphs=[];
-
-        vm.article.ranked_paragraphs.forEach( function(paragraph){
-
-          var start = 0;
-          var tokens=[];
-
-          paragraph.spans.sort(function(a, b) {
-            
-            if (a[0] < b[0]) return -1;
-            if (a[0] > b[0]) return 1;
-            return 0;
-          }).forEach( function(span){
-
-           
-            if(start!=span[0]){
-              var token={};
-              token.text=paragraph.text.slice(start, span[0]);
-              token.class="";
-              tokens.push(token);
-            }
-            var token={};
-            token.text=paragraph.text.slice(span[0], span[1]);
-            token.class="paragraph";
-            tokens.push(token);
-            start=span[1]+1;
-
-          });
-          var token={};
-          token.text=paragraph.text.slice(start,paragraph.text.length);
-          token.class="";
-          tokens.push(token);
-
-          vm.paragraphs.push(tokens);
-
-        });
-
-        console.log(vm.paragraphs);
+        
 
       }
     vm.getData(vm.pageno); // Call the function to fetch initial data on page load.
