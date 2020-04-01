@@ -81,6 +81,7 @@ papers, embeddings, times, authors, journals, licenses = map(list, zip(*[
 # Convert dates to years, flatten authors lists
 times = [date.split('-')[0] for date in times if type(date) is str]
 authors = [author for coautors in authors for author in coautors if author != ""]
+journals = [j for j in journals if j != '']
 c_times, c_authors, c_journals, c_licenses = Counter(times), Counter(authors), Counter(journals), Counter(licenses)
 
 @app.route("/")
