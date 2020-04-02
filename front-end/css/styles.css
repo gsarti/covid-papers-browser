@@ -149,3 +149,8 @@ span.paragraph{
     margin-left: 25%;
     font-size: 16px;
 }
+
+.dropdown-menu{
+overflow:  visible !important;
+min-height: fit-content !important;
+}

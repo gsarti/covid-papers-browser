@@ -133,7 +133,7 @@
               <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 articlelist">
 
 
-                <select id="year-selectpicker"  data-live-search="true" data-live-search-placeholder="Search" data-actions-box="true" class="selectpicker year-select" multiple  data-style="btn-primary" ng-model="data.year"  ng-options="year[0] for year in data.years" ng-change="data.update_button()">
+                <select id="year-selectpicker" data-size="3" data-height="100%" data-live-search="true" data-live-search-placeholder="Search" data-actions-box="true" class="selectpicker year-select" multiple  data-style="btn-primary" ng-model="data.year"  ng-options="year[0] for year in data.years" ng-change="data.update_button()">
                   
                 </select>
               </div>
@@ -147,7 +147,7 @@
               </div>
               <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
 
-                <select id="author-selectpicker"  data-live-search="true" data-live-search-placeholder="Search" data-actions-box="true" class="selectpicker author-select" multiple  data-style="btn-primary" ng-model="data.author"  ng-options="author[0] for author in data.authors" ng-change="data.update_button()">
+                <select id="author-selectpicker" data-size="3" data-live-search="true" data-live-search-placeholder="Search" data-actions-box="true" class="selectpicker author-select" multiple  data-style="btn-primary" ng-model="data.author"  ng-options="author[0] for author in data.authors" ng-change="data.update_button()">
                 </select>
               </div>
             </div>
@@ -160,7 +160,7 @@
 
               <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 articlelist">
 
-                <select id="journal-selectpicker" data-live-search="true" data-live-search-placeholder="Search" data-actions-box="true" class="selectpicker journal-select" multiple  data-style="btn-primary" ng-model="data.journal"  ng-options="journal[0] for journal in data.journals" ng-change="data.update_button()">
+                <select id="journal-selectpicker" data-size="3" data-live-search="true" data-live-search-placeholder="Search" data-actions-box="true" class="selectpicker journal-select" multiple  data-style="btn-primary" ng-model="data.journal"  ng-options="journal[0] for journal in data.journals" ng-change="data.update_button()">
                 </select>
 
               </div>
@@ -174,7 +174,7 @@
               </div>
 
               <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8 articlelist">
-                <select id="license-selectpicker"  data-live-search="true" data-live-search-placeholder="Search" data-actions-box="true" class="selectpicker license-select" multiple  data-style="btn-primary" ng-model="data.license"  ng-options="license[0] for license in data.licenses" ng-change="data.update_button()">
+                <select id="license-selectpicker"  data-size="3" data-live-search="true" data-live-search-placeholder="Search" data-actions-box="true" class="selectpicker license-select" multiple  data-style="btn-primary" ng-model="data.license"  ng-options="license[0] for license in data.licenses" ng-change="data.update_button()">
                 </select>
 
               </div>
@@ -186,7 +186,7 @@
               <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 articlelist" style="margin-top: 25px;">
                 <a href="#" id="submit-remove-filters"  ng-click="data.delete_filters()" class="filter  articlelist">  <i class="fas fa-times"></i> Clear all filters </a>
 
-                <div><button id="submit-update"  ng-click="data.getData(1)" class="filter form-submit-button btn btn-primary articlelist"> Update Filter</button></div>
+                <div><button id="submit-update" data-size="5" ng-click="data.getData(1)" class="filter form-submit-button btn btn-primary articlelist"> Update Filter</button></div>
 
               </div>
             </div> 
