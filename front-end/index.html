@@ -100,7 +100,7 @@
               <!--Article list modality-->
             <button id="submit" ng-click="data.getData(1)" class="form-submit-button btn btn-primary articlelist"> Search </button>
               <!--Article view modality-->
-            <button id="submit" ng-click="data.getarticleData(data.cord_id)" class="form-submit-button btn btn-primary articleview"> Search </button> 
+            <button id="{{data.cord_id}}" ng-click="data.getarticleData(data.cord_id)" class="form-submit-button btn btn-primary articleview"> Search </button> 
 
           </div>
 
@@ -201,7 +201,7 @@
                     <tr ng-show="data.articles.length <= 0"><td colspan="5" style="text-align:center;">Loading new data!!</td></tr>
                     <tr dir-paginate="article in data.articles|itemsPerPage:data.dinamicitemsPerPage" total-items="data.total_count">
                   
-                        <td><h3><a ng-href="#" ng-click="data.getarticleData(article.cord_id)"> {{article.title}} </a></h3>              
+                        <td><h3><a id="{{article.cord_id}}" ng-href="#" ng-click="data.getarticleData(article.cord_id)"> {{article.title}} </a></h3>              
 
                         <p>{{article.authors}}</p>
                         <p ng-if="article.abstract.length<=0"> abstract not available</p>

@@ -181,7 +181,7 @@ app.controller('listdata',function($http,$scope,$timeout){
 
     
     vm.getData = function(pageno){ 
-
+      vm.article={}
       console.log(vm.authors);
       /**
        * Modalità lista di articoli
@@ -299,7 +299,7 @@ app.controller('listdata',function($http,$scope,$timeout){
           data:{ 
             "query": vm.query,
             "cord_id":vm.cord_id,
-            "count":1
+            "count":10
            }
         }).then(function successCallback(response) {
              console.log(response);

@@ -168,7 +168,7 @@ def get_papers():
 def get_paper_by_id():
     count = request.get_json().get('count')
     if count is None:
-        count=1
+        count=10
     query = request.get_json().get('query')
 
     cord_id = request.get_json().get('cord_id')
