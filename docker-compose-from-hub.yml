@@ -1,0 +1,19 @@
+version: '3.0'
+services:
+  web:
+    image: covid-papers-browser:latest
+    environment:
+        FLASK_ENV: production
+        MONGO_URI: 'mongodb://mongo:27017/covid'
+    ports:
+        - "5000:5000"
+    depends_on:
+        - mongo
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    # volumes:
+    #     - .mongo:/data/db
+    ports:
+        - "27017:27017"
