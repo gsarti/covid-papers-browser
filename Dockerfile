@@ -7,4 +7,4 @@ RUN python -m spacy download en_core_web_sm
 COPY . .
 RUN chmod 755 ./scripts/start.sh
 EXPOSE 5000
-CMD ["python", './scripts/run_api.py']
+CMD ["./scripts/start.sh"]

@@ -30,7 +30,6 @@ if __name__ == "__main__":
     mongo_uri = os.environ.get("MONGO_URI",
                                f"mongodb://localhost:27017/{args.db_name}")
     logging.info(f'Connecting to mongo at {mongo_uri}')
-    print(mongo_uri)
     client = MongoClient(mongo_uri)
     db = client[args.db_name]
     col = db[args.collection_name]

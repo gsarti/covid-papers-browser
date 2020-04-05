@@ -8,14 +8,10 @@ services:
             # MONGO_URI: 'mongodb://0.0.0.0:27017/covid'
         ports:
             - "5000:5000"
-        depends_on:
-            - mongo
         links:
-            - mongo  
+            - mongo 
     mongo:
         image: mongo
-        container_name: mongo
-        restart: always
         # volumes:
         #     - .mongo:/data/db
         ports:
