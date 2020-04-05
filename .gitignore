@@ -9,3 +9,5 @@ pytorch_model.bin
 
 data/
 !data/README.md
+
+dump/

@@ -55,6 +55,7 @@ app.config["MONGO_URI"] = f"mongodb://localhost:27017/{args.db_name}"
 mongo = PyMongo(app)
 overview_col = mongo.db[args.overview_collection_name]
 details_col = mongo.db[args.details_collection_name]
+details_col.create_index('cord_id')
 model = load_sentence_transformer(name=args.model_name)
 nlp = spacy.load("en_core_web_sm")
 papers, embeddings, times, authors, journals, licenses = map(list, zip(*[
@@ -129,7 +130,7 @@ def get_papers():
         if len(p_years) > 0:
             match = [(m,s) for m,s in match if m.year in p_years]
         if len(p_authors) > 0:
-            match = [(m,s) for m,s in match if all(a in m.authors for a in p_authors)]
+            match = [(m,s) for m,s in match if any(a in m.authors for a in [ p_author[0] for p_author in p_authors])]
         if len(p_journals) > 0:
             match = [(m,s) for m,s in match if m.journal in p_journals]
         if len(p_licenses) > 0:
