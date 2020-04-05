@@ -21,9 +21,6 @@ from covid_browser import (load_sentence_transformer, match_query,
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--model_name",
-    default="gsarti/scibert-nli",
-    type=str,
     "--db_name", 
     default="covid",
     type=str, 
