@@ -55,6 +55,7 @@ app = Flask(__name__,
             template_folder=os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), os.pardir,
                 'templates'))
+CORS(app)
 app.config["MONGO_URI"] = os.environ.get(
     "MONGO_URI", f"mongodb://localhost:27017/{args.db_name}")
 logging.info(f'MONGO_URI={app.config["MONGO_URI"]}')

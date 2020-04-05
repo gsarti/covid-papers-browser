@@ -1,5 +1,5 @@
 
-const baseurl='http://localhost:5000';
+const baseurl='http://0.0.0.0:5000';
 //**gli articoli con più di 150 caratteri vengono troncati, la scritta scchow more sostituisce il testo eliminato*/
 const show_text = function(){ /* to make sure the script runs after page load */
 
