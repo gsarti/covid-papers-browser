@@ -149,11 +149,7 @@ def get_papers():
         if len(p_years) > 0:
             match = [(m,s) for m,s in match if str(m.year) in [ str(p_year[0]) for p_year in p_years]]
         if len(p_authors) > 0:
-<<<<<<< HEAD
             match = [(m,s) for m,s in match if any(a in m.authors for a in [ p_author[0] for p_author in p_authors])]
-=======
-            match = [(m,s) for m,s in match if all(a in m.authors for a in [ p_author[0] for p_author in p_authors])]
->>>>>>> api per recuperare anno, autore, journal, licenza e query. ATTENZIONE: sicuro di voler lasciare la ricerca per autore in AND? limite di autore, journal, year e licenza a 1000. ci vuole un pò di tempo per renderizzare le select. un limite inferiore rende il rendering veloce, ma un numero basso di autori potrebbe rendere il filtro superfluo. Che fare?
         if len(p_journals) > 0:
             match = [(m,s) for m,s in match if m.journal in [p_journal[0] for p_journal in p_journals]]
         if len(p_licenses) > 0:
