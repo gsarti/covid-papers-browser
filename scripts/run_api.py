@@ -142,8 +142,7 @@ def get_papers():
     page = request.get_json().get('page')
     if page is None:
         page=1
-    print(query)
-    if query is not None:
+    if query:
         match = match_query(query, model, papers, embeddings)
         match = [(m,s) for m,s in match if s > score]
         if len(p_years) > 0:

@@ -143,7 +143,7 @@ app.controller('listdata',function($http,$scope,$timeout){
     vm.pageno = 1; // initialize page no to 1
     vm.total_count = 1;
     vm.dinamicitemsPerPage=10;
-    vm.query="What is the effect od Covid-19 on pregnant women?";
+    vm.query="";
     //vm.itemsPerPage = $scope.dinamicitemsPerPage; //this could be a dynamic value from a drop down
 
 
@@ -178,6 +178,24 @@ app.controller('listdata',function($http,$scope,$timeout){
 
   
    };
+
+    vm.exampleSearch = function(){
+      $("#search").val("Is chloroquine effective against SARS-CoV-2?")
+      vm.query="Is chloroquine effective against SARS-CoV-2?"
+      vm.getData(1)
+    };
+
+    var input_bar = document.getElementById("search");
+
+    input_bar.addEventListener("keyup", function(event) {
+      // Number 13 is the "Enter" key on the keyboard
+      if (event.keyCode === 13) {
+        // Cancel the default action, if needed
+        event.preventDefault();
+        // Trigger the button element with a click
+        vm.getData(1);
+      }
+    }); 
 
     
     vm.getData = function(pageno){ 
@@ -218,6 +236,7 @@ app.controller('listdata',function($http,$scope,$timeout){
         //cambio modalità 
         $(".articleview").hide();
         $(".articlelist").show();
+        $("#description").show();
 
         //non c'è alcun articolo selezionato
         vm.articleid=0;
@@ -246,6 +265,12 @@ app.controller('listdata',function($http,$scope,$timeout){
 
              //simila la restiuzione del numeroo totale degli articoli, utile solo in fase demo
              vm.total_count = response.data.total;
+
+             if (typeof vm.total_count == "undefined") {
+               $(".articlelist-body").hide()
+             } else {
+              $(".articlelist-body").show()
+             }
              
              //simula la paginazione, utile solo in fase demo
              //vm.articles = vm.articles.slice((pageno-1)*vm.dinamicitemsPerPage, ((pageno-1)*vm.dinamicitemsPerPage)+vm.dinamicitemsPerPage);
@@ -257,6 +282,7 @@ app.controller('listdata',function($http,$scope,$timeout){
              console.log("author",vm.author);
              console.log("journal",vm.journal);
              console.log("license",vm.license);
+             console.log("len", vm.total_count);
 
              //dopo aver renderizzato gli articoli chiamo la funzione showtext che mostra il tasto show more per testi più lunghi di 150 caratteri
              $timeout(function() {
@@ -292,6 +318,7 @@ app.controller('listdata',function($http,$scope,$timeout){
         //cambio modalità grafica
         $(".articleview").show();
         $(".articlelist").hide();
+        $("#description").hide();
 
         $http({
           method: 'POST',

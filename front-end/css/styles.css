@@ -1,33 +1,101 @@
 .row{
-
     margin-bottom: 5px;
-
-
 }
+
 #banner {
-background-color: #009246;
-height: 50px;
-border-top:1px solid #000;
-margin-bottom: 5px;
-
-}
-#header {
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #009246;
-}
-.img-responsive{
-    margin-top: 15px;
-
-
+    background-color: #009246;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-h1 {
-    line-height: 80%;
-
-    color: #52565A;
-
+#banner-title {
+    color: white;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
+
+#icon {
+    min-height:70px;
+    height:auto;
+    float: left;
+}
+
+#github-icon {
+    max-height:40px;
+    height:auto;
+    float: right;
+    align-self: flex-end;
+}
+
+.left-side {
+    flex-basis: 60%;
+    display: flex;
+    align-items: center;
+}
+
+.filler {
+    flex-grow: 1;
+}
+
+.filter-section {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
+.query-section {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+}
+
+#search {
+    font-size:17px;
+    height:45px;
+    border-style: solid none solid solid;
+    border-width: 1px medium 1px 1px;
+    border-radius: 4px 0px 0px 4px;
+}
+#submit-exit {
+    width:50px;
+    height:45px;
+    margin-top:0px !important;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+}
+
+.search-btn {
+    height: 45px !important;
+    margin-top: 0px !important;
+    border-radius: 0px 4px 4px 0px;
+}
+
+.searchbar {
+    display: flex;
+    align-items: center;
+}
+
+.description {
+    font-size:16px !important;
+    margin-bottom: 20px;
+}
+
+#yearlabel, #author, #journal, #source {
+    font-size: 15px;
+    align-content: center;
+}
+
+.flexbox {
+    display: flex;
+    align-content: center;
+}
+
 h2 {
     padding-bottom: 10px !important; 
     color: #009246;
@@ -62,7 +130,13 @@ a:visited{
 
 }
 
+.articlelist-body {
+ margin-top: 50px
+}
 
+.authors {
+    color: rgba(84,105,115,.8)
+}
 
 #submit-update{
 
@@ -144,13 +218,25 @@ span.paragraph{
     background-color: #ffffff !important;
     color:rgb(100, 100, 100);
     width: 100%;
-    margin-top: 30px;
-    
-    margin-left: 25%;
     font-size: 16px;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 25px;
+    margin-bottom: 25px;
 }
 
 .dropdown-menu{
 overflow:  visible !important;
 min-height: fit-content !important;
+}
+
+#footer {
+    display: flex;
+    align-content: flex-end;
+    margin-top:30px;
+    margin-bottom:60px;
 }
