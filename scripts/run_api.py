@@ -51,7 +51,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 app = Flask(__name__, template_folder=os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir, 'templates'))
-app.config["MONGO_URI"] = f"mongodb://localhost:27017/{args.db_name}"
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI", f"mongodb://localhost:27017/{args.db_name}")
 mongo = PyMongo(app)
 overview_col = mongo.db[args.overview_collection_name]
 details_col = mongo.db[args.details_collection_name]
@@ -149,9 +149,8 @@ def get_paper_by_id(id):
     if x is not None:
         paper = PaperDetails(x)
         scores, indices = [], []
-        if query is not None and len(paper.paragraphs) > 0:
-            doc = nlp(query)
-            match = match_query(query, model, paper.paragraphs, paper.paragraphs_embeddings)
+        if query is True:
+            match_query(query, model, paper.paragraphs, paper.paragraphs_embeddings)
             paper.ranked_paragraphs, scores = map(list, zip(*
                 [(p,s) for p,s in match if s > score][:count]
             ))
@@ -165,4 +164,9 @@ def get_paper_by_id(id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # get enviroment variables
+    env = os.environ.get('FLASK_ENV', 'development')
+    port =  os.environ.get('FLASK_PORT', 5000)
+    debug = env == 'development'
+
+    app.run(debug=debug, port=port)
