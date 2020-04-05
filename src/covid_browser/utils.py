@@ -8,6 +8,8 @@ from nltk.tokenize import sent_tokenize
 from sentence_transformers import models, SentenceTransformer
 from .paper import PaperDatabaseEntryDetails, PaperDatabaseEntryOverview
 
+MAX_SIZE = 16793600 # Max BSONObject size
+MAX_PARAGRAPH_COUNT = 100 # Max # of paragraphs per section
 
 def load_sentence_transformer(
     name: str = 'gsarti/scibert-nli', 
@@ -63,7 +65,7 @@ def create_db_entry(
                 paragraphs.append((paragraph['section'], paragraph['text']))
         for key, paragraph in file['ref_entries'].items():
             paragraphs.append((paragraph['type'].title(), paragraph['text']))
-        db_entry.paragraphs = paragraphs
+        db_entry.paragraphs = paragraphs[:MAX_PARAGRAPH_COUNT]
         db_entry.compute_paragraphs_embeddings(model)
         db_entry.bibliography = [file['bib_entries'][entry] for entry in file['bib_entries']]
     return db_entry
