@@ -9,6 +9,7 @@ from collections import Counter
 from flask import Flask, request, json, render_template
 from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
+from flask_cors import CORS
 
 sys.path.append(
     os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir,
@@ -19,25 +20,34 @@ from covid_browser import (load_sentence_transformer, match_query,
                            get_relevant_span, PaperOverview, PaperDetails)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--db_name",
-                    default="covid",
-                    type=str,
-                    required=False,
-                    help="Mongo database name.")
-parser.add_argument("--overview_collection_name",
-                    default="cord19scibertoverview",
-                    type=str,
-                    required=False,
-                    help="Mongo collection name.")
-parser.add_argument("--details_collection_name",
-                    default="cord19scibertdetails",
-                    type=str,
-                    required=False,
-                    help="Mongo collection name.")
 parser.add_argument(
     "--model_name",
     default="gsarti/scibert-nli",
     type=str,
+    "--db_name", 
+    default="covid",
+    type=str, 
+    required=False,
+    help="Mongo database name."
+)
+parser.add_argument(
+    "--overview_collection_name", 
+    default="cord19scibertoverview", 
+    type=str, 
+    required=False,
+    help="Mongo collection name."
+)
+parser.add_argument(
+    "--details_collection_name", 
+    default="cord19scibertdetails", 
+    type=str, 
+    required=False,
+    help="Mongo collection name."
+)
+parser.add_argument(
+    "--model_name", 
+    default="gsarti/scibert-nli", 
+    type=str, 
     required=False,
     help=
     "One among the models supported by HuggingFace AutoModel (e.g. `gsarti/scibert-nli`)"
@@ -91,60 +101,85 @@ def help():
 
 @app.route("/years")
 def get_years():
-    count = request.args.get('count', default=10, type=int)
+    count = request.args.get('count', default = 1000, type = int)
     return json.jsonify(c_times.most_common(count))
 
 
 @app.route("/authors")
 def get_authors():
-    count = request.args.get('count', default=10, type=int)
+    count = request.args.get('count', default = 1000, type = int)
     return json.jsonify(c_authors.most_common(count))
 
 
 @app.route("/journals")
 def get_journals():
-    count = request.args.get('count', default=10, type=int)
+    count = request.args.get('count', default = 1000, type = int)
     return json.jsonify(c_journals.most_common(count))
 
 
 @app.route("/licenses")
 def get_licenses():
-    count = request.args.get('count', default=10, type=int)
+    count = request.args.get('count', default = 1000, type = int)
     return json.jsonify(c_licenses.most_common(count))
 
 
-@app.route("/paper")
+@app.route("/paper", methods=['POST'])
 def get_papers():
-    count = request.args.get('count', default=10, type=int)
-    query = request.args.get('query', default=None, type=str)
-    score = request.args.get('score', default=0.0, type=float)
-    p_years = request.args.getlist('year')
-    p_authors = request.args.getlist('author')
-    p_journals = request.args.getlist('journal')
-    p_licenses = request.args.getlist('license')
-    if query is not None:
+    print(request)
+    count = request.get_json().get('count')
+    if count is None:
+        count=10
+    query = request.get_json().get('query')
+    score = request.get_json().get('score')
+    if score is None:
+        score=0.0
+    p_years = request.get_json().get('year')
+    if p_years is None:
+        p_years=[]
+    p_authors = request.get_json().get('author')
+    if p_authors is None:
+        p_authors=[]
+    p_journals = request.get_json().get('journal')
+    if p_journals is None:
+        p_journals=[]
+    p_licenses = request.get_json().get('license')
+    if p_licenses is None:
+        p_licenses=[]
+    page = request.get_json().get('page')
+    if page is None:
+        page=1
+    if query:
         match = match_query(query, model, papers, embeddings)
         match = [(m, s) for m, s in match if s > score]
         if len(p_years) > 0:
-            match = [(m, s) for m, s in match if m.year in p_years]
+            match = [(m,s) for m,s in match if str(m.year) in [ str(p_year[0]) for p_year in p_years]]
         if len(p_authors) > 0:
             match = [(m,s) for m,s in match if any(a in m.authors for a in [ p_author[0] for p_author in p_authors])]
         if len(p_journals) > 0:
-            match = [(m, s) for m, s in match if m.journal in p_journals]
+            match = [(m,s) for m,s in match if m.journal in [p_journal[0] for p_journal in p_journals]]
         if len(p_licenses) > 0:
-            match = [(m, s) for m, s in match if m.license in p_licenses]
+            match = [(m,s) for m,s in match if m.license in [p_licence[0] for p_licence in p_licenses]]
         results = [paper.as_dict(score) for paper, score in match]
-        return json.jsonify(results[:count])
+        return json.jsonify({ "total": len(results), "data": results[count*(page-1):count*page]} )
     else:
         return json.jsonify([])
 
 
-@app.route("/paper/<id>")
-def get_paper_by_id(id):
-    count = request.args.get('count', default=10, type=int)
-    query = request.args.get('query', default=None, type=str)
-    score = request.args.get('score', default=0.0, type=float)
-    x = details_col.find_one({'cord_id': id})
+@app.route("/singlearticle", methods=['POST'])
+def get_paper_by_id():
+    count = request.get_json().get('count')
+    if count is None:
+        count=10
+    query = request.get_json().get('query')
+
+    cord_id = request.get_json().get('cord_id')
+    if cord_id is None:
+        return {}
+
+    score = request.get_json().get('score')
+    if score is None:
+        score=0.0
+    x = details_col.find_one({'cord_id': cord_id})
     if x is not None:
         paper = PaperDetails(x)
         scores, indices = [], []
@@ -169,3 +204,4 @@ if __name__ == "__main__":
     debug = env == 'development'
 
     app.run(host="0.0.0.0", debug=debug, port=port)
+
