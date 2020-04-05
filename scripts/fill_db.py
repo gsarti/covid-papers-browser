@@ -1,5 +1,7 @@
 import argparse
 import pickle
+import os
+import logging
 from tqdm import tqdm
 from pymongo import MongoClient
 
@@ -24,10 +26,15 @@ if __name__ == "__main__":
         "Filenames for .pkl files containing entries for filling the database."
     )
     args = parser.parse_args()
-    client = MongoClient()
+
+    mongo_uri = os.environ.get("MONGO_URI",
+                               f"mongodb://localhost:27017/{args.db_name}")
+    logging.info(f'Connecting to mongo at {mongo_uri}')
+    print(mongo_uri)
+    client = MongoClient(mongo_uri)
     db = client[args.db_name]
     col = db[args.collection_name]
-    
+
     for fname in tqdm(args.filename):
         with open(fname, 'rb') as f:
             entries = pickle.load(f)
