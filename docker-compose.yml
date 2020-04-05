@@ -1,0 +1,18 @@
+version: '3.0'
+services:
+    web:
+        build: .
+        environment:
+            FLASK_ENV: production
+            MONGO_URI: 'mongodb://mongo:27017/covid'
+            # MONGO_URI: 'mongodb://0.0.0.0:27017/covid'
+        ports:
+            - "5000:5000"
+        links:
+            - mongo 
+    mongo:
+        image: mongo
+        # volumes:
+        #     - .mongo:/data/db
+        ports:
+            - "27017:27017"
