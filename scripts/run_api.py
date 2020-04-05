@@ -57,7 +57,12 @@ app.config["MONGO_URI"] = f"mongodb://localhost:27017/{args.db_name}"
 mongo = PyMongo(app)
 overview_col = mongo.db[args.overview_collection_name]
 details_col = mongo.db[args.details_collection_name]
+# #  indexing by cord_id to increase access speed
 details_col.create_index('cord_id')
+# index_name = 'cord_id'
+# if index_name not in details_col.index_information():
+#     details_col.create_index(index_name, unique=True)
+# setup NLP models
 model = load_sentence_transformer(name=args.model_name)
 nlp = spacy.load("en_core_web_sm")
 papers, embeddings, times, authors, journals, licenses = map(list, zip(*[
