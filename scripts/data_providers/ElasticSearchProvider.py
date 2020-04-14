@@ -33,14 +33,14 @@ class ElasticSearchProvider:
     """
     entries: list()
     client: Elasticsearch = Elasticsearch()
-    doc: dict  = field(default_factory=dict)
+    doc: list  = field(default_factory=list)
 
 
     def create_documents(self, out_path: Path, index_name: str = 'covid-19'):
         for entry in tqdm(self.entries):
             entry_elastic  = {**entry, **{ '_op_type': 'index', '_index': index_name}}
             # TODO this can become huge!
-            self.doc = {**self.doc, **entry}
+            self.doc.append(entry_elastic)
 
     def create_index(self, index_path:Path, index_name: str = 'covid-19'):
         """Fill up elastic search
