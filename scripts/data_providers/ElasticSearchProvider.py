@@ -5,6 +5,8 @@ import logging
 from tqdm import tqdm
 import pandas as pd
 import pickle
+import json
+from elasticsearch.helpers import bulk
 
 # TODO this should be moved in a shared file
 logging.basicConfig(level=logging.DEBUG)
@@ -32,14 +34,14 @@ class ElasticSearchProvider:
     ```
     """
     entries: list()
+    index_file:  dict
     client: Elasticsearch = Elasticsearch()
     doc: list  = field(default_factory=list)
-
+    # add index
 
     def create_documents(self, out_path: Path, index_name: str = 'covid-19'):
         for entry in tqdm(self.entries):
             entry_elastic  = {**entry, **{ '_op_type': 'index', '_index': index_name}}
-            
             # TODO this can become huge!
             self.doc.append(entry_elastic)
 
@@ -53,7 +55,8 @@ class ElasticSearchProvider:
         """
         # TODO add option to remove
         self.client.indices.delete(index=index_name, ignore=[404])
-        self.client.indices.create(index=index_name, body=self.doc)
+        self.client.indices.create(index=index_name, body=self.index_file) 
+
 
     def __call__(self, out_path:Path, index_name: str = 'covid-19'):
         """In order
@@ -71,8 +74,9 @@ class ElasticSearchProvider:
 
         logging.info(f'Creating index from {out_path} with name={index_name}...')
         self.create_index(out_path, index_name)
-        with open(out_path, 'w'):
-            f.write(json.dumps(self.doc))
+        bulk(self.client, self.doc)
+        # with open(out_path, 'w') as f:
+        #     f.write(json.dumps(self.doc))
 
     @classmethod
     def from_pkls(cls, root: Path, *args, **kwars):
@@ -105,17 +109,50 @@ class ElasticSearchProvider:
                     entry['paragraphs'] = entry['paragraphs'][:100]
                     entry['paragraphs_embeddings'] = entry[
                         'paragraphs_embeddings'][:100]
+                tmp = {'title': entry['title'], 'doi': entry['doi'],  
+                'abstract' : entry['abstract'],  }
+                yield tmp 
 
-                yield entry 
-
-        return cls(_stream())
+        return cls(_stream(), *args, **kwars)
 
         
 
 
-elastic_provider = ElasticSearchProvider.from_pkl(Path('../data/db_entries2.pkl'))
+# elastic_provider = ElasticSearchProvider.from_pkl(Path('../data/db_entries2.pkl'))
+index_file = {
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "dynamic": "true",
+    "_source": {
+      "enabled": "true"
+    },
+    "properties": {
+      "title": {
+        "type": "text"
+      },
+      "abstract": {
+        "type": "text"
+      },
+      "doi": {
+        "type": "text"
+      },
 
-elastic_provider(Path('../data/elastic.json'))
+    }
+  }
+}
+
+# embedding dim = 768
+elastic_provider = ElasticSearchProvider.from_pkl(Path('../data/db_entries2.pkl'),  index_file=index_file)
+
+# elastic_provider = ElasticSearchProvider([{
+#     'title' : 'title', 
+#     'abstract': 'foo', 
+#     'doi' : 'asd'}], index_file=index_file)
+
+elastic_provider(out_path=Path('../data/elastic.json'))
 
 # df = pd.read_csv(Path('../data/metadata.csv'), nrows=100)
 
