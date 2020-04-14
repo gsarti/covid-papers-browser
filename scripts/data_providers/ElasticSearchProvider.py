@@ -12,8 +12,17 @@ logging.basicConfig(level=logging.DEBUG)
 
 @dataclass
 class ElasticSearchProvider:
-    """
-    This class fills up elasticsearch using a common interface. 
+    """ 
+    This class fills up elasticsearch using a common interface. This is convenient since one can define a custom classmethod
+    for a custom data source. E.g. if you want to directly use a model to create the embeddings
+    ```
+    class MyElasticSearchProvider(ElasticSearchProvider):
+        @classmethod
+        def from_transformers_model(cls, model, datas):
+            for data in datas:
+                title_emb = model(data['title'])
+                yield { 'title' : data['title], ..., 'title_abstract_embeddings' : title_emb }
+    ```
     The ouput must be a iterable composed by dict with the following keys:
 
     TODO keys must be reviewed with @Gabriele
@@ -63,7 +72,7 @@ class ElasticSearchProvider:
         self.create_index(out_path, index_name)
         with open(out_path, 'w'):
             f.write(json.dumps(self.doc))
-    
+
     @classmethod
     def from_pkls(cls, root: Path, *args, **kwars):
         """Fill up elastic search from dir with .pkl files
