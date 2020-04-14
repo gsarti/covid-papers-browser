@@ -12,48 +12,26 @@ logging.basicConfig(level=logging.DEBUG)
 
 @dataclass
 class ElasticSearchProvider:
-    # a DataFrame containg all the infos about the papers
-    metafile: pd.DataFrame 
-    # or a generator -> how to set generator type on fields ?
-    embeddings: tuple = field(default_factory=list) # tuple of embeddings, (abstract, paragram)
+    """
+    This class fills up elasticsearch using a common interface. 
+    The ouput must be a iterable composed by dict with the following keys:
+
+    TODO keys must be reviewed with @Gabriele
+
+    ```
+    cord_id', 'url', 'sha', 'title', 'source', 'doi', 'pmc_id', 'pubmed_id', 'license', 'abstract', 'publish_time', 'authors', 'journal', 'microsoft_id', 'who_id', 'paragraphs', 'bibliography', 'title_abstract_embeddings', 'paragraphs_embeddings
+    ```
+    """
+    entries: list()
     client: Elasticsearch = Elasticsearch()
-    doc: dict = field(default_factory=dict)
-    
-    def load_meta(self):
-        docs = []
-        df = self.metafile
-        for row in df.iterrows():
-            series = row[1]
-            doc = {
-                'title': str(series.title),
-                'abstract': str(series.abstract),
-                'authors': str(series.authors),
-                'doi': str(series.doi)
-            }
-            # REVIEW could yield but the csv is not that big
-            docs.append(doc)
-        return docs
-
-    def create_document(self, doc: dict, abstract_emb: list, paragraph_emb: list, index_name: str = 'covid-19'):
-        return {
-            '_op_type': 'index',
-            '_index': index_name,
-            'abstract': doc['abstract'],
-            'authors': doc['authors'],
-            'doi': doc['doi'],
-            'title': doc['title'],
-            'abstract_emb': emb,
-            'paragraph_emb': emb
-
-        }
+    doc: dict  = field(default_factory=dict)
 
 
     def create_documents(self, out_path: Path, index_name: str = 'covid-19'):
-        for doc, (abstract_emb, paragraph_emb) in zip(docs, self.embeddings):
-            d = self.create_document(doc, abstract_emb, paragraph_emb, index_name)
-            self.doc = {**doc, **d}
-
-            # TODO write to disk each time is blocking and slow
+        for entry in tqdm(self.entries):
+            entry_elastic  = {**entry, **{ '_op_type': 'index', '_index': index_name}}
+            # TODO this can become huge!
+            self.doc = {**self.doc, **entry}
 
     def create_index(self, index_path:Path, index_name: str = 'covid-19'):
         """Fill up elastic search
@@ -64,24 +42,28 @@ class ElasticSearchProvider:
         :type index_name: str, optional
         """
         # TODO add option to remove
-        client.indices.delete(index=index_name, ignore=[404])
-        client.indices.create(index=index_name, body=self.doc)
-
+        self.client.indices.delete(index=index_name, ignore=[404])
+        self.client.indices.create(index=index_name, body=self.doc)
 
     def __call__(self, out_path:Path, index_name: str = 'covid-19'):
-        bar = tqdm.bar(total=3)
-        bar.set_description(f'Reading metafile from {self.metapath}...')
-        bar.update()
-        docs = self.load_meta()
-        bar.set_description('Building documents...')
-        self.create_documents(output_path, index_name)
-        bar.set_description(f'Creating index from {out_path} with name={index_name}...')
-        f.write(json.dumps(self.doc))
+        """In order
+
+        - [ ] create all the documents
+        - [ ] create a new index from the document
+        
+        :param out_path: [description]
+        :type out_path: Path
+        :param index_name: [description], defaults to 'covid-19'
+        :type index_name: str, optional
+        """
+
+        self.create_documents(out_path, index_name)
+
+        logging.info(f'Creating index from {out_path} with name={index_name}...')
         self.create_index(out_path, index_name)
-        bar.update()
-        bar.set_description('Done!')
-
-
+        with open(out_path, 'w'):
+            f.write(json.dumps(self.doc))
+    
     @classmethod
     def from_pkls(cls, root: Path, *args, **kwars):
         """Fill up elastic search from dir with .pkl files
@@ -104,21 +86,26 @@ class ElasticSearchProvider:
         """
         with open(filepath, 'rb') as f:
             entries = pickle.load(f)
-        print(len(entries))
+
         logging.info(f'Loading entries from {filepath} ...')
-        for entry in tqdm(entries):
-            if 'paragraphs' in entry:
-                # TODO by @Francesco, we can iterate in paragraphs and create subdocuments linked to paragraphs
-                entry['paragraphs'] = entry['paragraphs'][:100]
-                entry['paragraphs_embeddings'] = entry[
-                    'paragraphs_embeddings'][:100]
+        def _stream():
+            for entry in tqdm(entries[:5]):
+                if 'paragraphs' in entry:
+                    # TODO by @Francesco, we can iterate in paragraphs and create subdocuments linked to paragraphs
+                    entry['paragraphs'] = entry['paragraphs'][:100]
+                    entry['paragraphs_embeddings'] = entry[
+                        'paragraphs_embeddings'][:100]
 
-            yield entry 
+                yield entry 
+
+        return cls(_stream())
+
+        
 
 
-for entry in ElasticSearchProvider.from_pkl(Path('../data/db_entries2.pkl')):
-    print(entry)
-    break
+elastic_provider = ElasticSearchProvider.from_pkl(Path('../data/db_entries2.pkl'))
+
+elastic_provider(Path('../data/elastic.json'))
 
 # df = pd.read_csv(Path('../data/metadata.csv'), nrows=100)
 
