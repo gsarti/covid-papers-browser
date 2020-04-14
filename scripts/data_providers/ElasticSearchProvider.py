@@ -9,9 +9,11 @@ from tqdm import tqdm
 @dataclass
 class ElasticSearchBuilder:
     metapath: Path 
+    # or a generator -> how to set generator type on fields ?
     embeddings: list = field(default_factory=list)
     client: Elasticsearch = Elasticsearch()
-
+    doc: dict = field(default_factory=dict)
+    
     def load_meta(self):
         docs = []
         df = pd.read_csv(self.metapath)
@@ -23,6 +25,7 @@ class ElasticSearchBuilder:
                 'authors': str(series.authors),
                 'doi': str(series.doi)
             }
+            # REVIEW could yield but the csv is not that big
             docs.append(doc)
         return docs
 
@@ -38,6 +41,16 @@ class ElasticSearchBuilder:
         }
 
 
+    def create_documents(self, out_path: Path, index_name: str = 'covid-19'):
+            with open(out_path, 'w') as f:
+            for doc, emb in zip(docs, self.embeddings):
+                d = self.create_document(doc, emb, index_name)
+                self.doc = {***doc, **d}
+
+                # TODO write to disk each time is blocking and slow
+                f.write(json.dumps(d) + '\n')
+
+
     def create_index(self, index_path:Path, index_name: str = 'covid-19'):
         """Fill up elastic search
         
@@ -46,17 +59,9 @@ class ElasticSearchBuilder:
         :param index_name: [description], defaults to 'covid-19'
         :type index_name: str, optional
         """
-        client.indices.delete(index=args.index_name, ignore=[404])
-        with open(index_path) as index_file:
-            source = index_file.read().strip()
-            client.indices.create(index=index_name, body=source)
+        client.indices.delete(index=index_name, ignore=[404])
+        client.indices.create(index=index_name, body=self.doc)
 
-
-    def create_documents(self, out_path: Path, index_name: str = 'covid-19'):
-            with open(out_path, 'w') as f:
-            for doc, emb in zip(docs, bulk_predict(docs,int(args.batch_size))):
-                d = self.create_document(doc, emb, index_name)
-                f.write(json.dumps(d) + '\n')
 
 
     def __call__(self, out_path:Path, index_name: str = 'covid-19'):
@@ -67,7 +72,8 @@ class ElasticSearchBuilder:
         bar.set_description('Building documents...')
         self.create_documents(output_path, index_name)
         bar.set_description('Creating index from {out_path} with name={index_name}...')
-        self.create(out_path, index_name)
+        f.write(json.dumps(self.doc))
+        self.create_index(out_path, index_name)
         bar.update()
         bar.set_description('Done!')
 
