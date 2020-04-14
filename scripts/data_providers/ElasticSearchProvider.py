@@ -39,6 +39,7 @@ class ElasticSearchProvider:
     def create_documents(self, out_path: Path, index_name: str = 'covid-19'):
         for entry in tqdm(self.entries):
             entry_elastic  = {**entry, **{ '_op_type': 'index', '_index': index_name}}
+            
             # TODO this can become huge!
             self.doc.append(entry_elastic)
 
