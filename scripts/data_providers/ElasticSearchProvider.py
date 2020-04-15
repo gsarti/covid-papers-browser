@@ -9,7 +9,7 @@ import json
 from elasticsearch.helpers import bulk
 
 # TODO this should be moved in a shared file
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 # Mainly inspired by https://github.com/t0m-R/covid19-search-engine/blob/master/py/create_documents.py
 
 @dataclass
@@ -103,14 +103,17 @@ class ElasticSearchProvider:
 
         logging.info(f'Loading entries from {filepath} ...')
         def _stream():
-            for entry in tqdm(entries[:5]):
+            for entry in tqdm(entries):
                 if 'paragraphs' in entry:
                     # TODO by @Francesco, we can iterate in paragraphs and create subdocuments linked to paragraphs
-                    entry['paragraphs'] = entry['paragraphs'][:100]
+                    entry['paragraphs'] = entry['paragraphs'][:5]
                     entry['paragraphs_embeddings'] = entry[
                         'paragraphs_embeddings'][:100]
                 tmp = {'title': entry['title'], 'doi': entry['doi'],  
-                'abstract' : entry['abstract'],  }
+                'abstract' : entry['abstract'], 
+                'title_abstract_embeddings': entry['title_abstract_embeddings'],
+                'paragraphs_embeddings': entry['paragraphs_embeddings']
+                 }
                 yield tmp 
 
         return cls(_stream(), *args, **kwars)
@@ -139,20 +142,24 @@ index_file = {
       "doi": {
         "type": "text"
       },
-
+      "title_abstract_embeddings": {
+        "type": "dense_vector",
+        "dims": 768
+      },
+      "paragraphs_embeddings": []
     }
   }
 }
 
 # embedding dim = 768
-elastic_provider = ElasticSearchProvider.from_pkl(Path('../data/db_entries2.pkl'),  index_file=index_file)
+elastic_provider = ElasticSearchProvider.from_pkl(Path('./data/db_entries2.pkl'),  index_file=index_file)
 
 # elastic_provider = ElasticSearchProvider([{
 #     'title' : 'title', 
 #     'abstract': 'foo', 
 #     'doi' : 'asd'}], index_file=index_file)
 
-elastic_provider(out_path=Path('../data/elastic.json'))
+elastic_provider(out_path=Path('./data/elastic.json'))
 
 # df = pd.read_csv(Path('../data/metadata.csv'), nrows=100)
 
