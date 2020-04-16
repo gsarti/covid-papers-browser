@@ -75,9 +75,9 @@ class ElasticSearchProvider:
             }
 
             self.doc.append(entry_elastic)
-            should_bulk = len(current_batch) >= batch_size
+            should_bulk = len(self.doc) >= batch_size
             if should_bulk:
-                bulk(self.client)
+                bulk(self.client, self.doc)
                 self.doc = []
 
     def __call__(self, batch_size: int = 128):
@@ -87,6 +87,7 @@ class ElasticSearchProvider:
         - [ ] create a new index from the document
         
         """
+        self.drop()
         logging.info(f'Creating index {self.index_name}...')
         self.create_index()
         logging.info(f'Creating documents...')
@@ -99,7 +100,7 @@ class ElasticSearchProvider:
             f.write(json.dumps(self.doc))
 
     @classmethod
-    def from_pkls(cls, root: Path, *args, **kwars):
+    def from_pkls(cls, root: Path, n_paragraphs: int = 100, *args, **kwars):
         """Fill up elastic search from dir with .pkl files
         :param root: Root of the folder that contains the pickle files
         :type root: Path
@@ -108,27 +109,43 @@ class ElasticSearchProvider:
         logging.info(f'Found {len(filepaths)} files in {root}')
 
         providers = []
+        
+        def _stream():
+            for file_path in filepaths:
+                try:
+                    with open(file_path, 'rb') as f:
+                        entries = pickle.load(f)
 
-        for file_path in filepaths:
-            try:
-                provider = cls.from_pkl(file_path, *args, **kwars)
-                providers.append(provider)
-            except Exception as e:
-                logging.warning(f'Error {e} when processing file={file_path}')
+                        logging.info(f'Loading entries from {file_path} ...')
 
-        return providers
+                        for entry in tqdm(entries):
+                            if 'paragraphs' in entry:
+                                # TODO by @Francesco, we can iterate in paragraphs and create subdocuments linked to paragraphs
+                                entry['paragraphs'] = entry['paragraphs'][:n_paragraphs]
+                                entry['paragraphs_embeddings'] = entry[
+                                    'paragraphs_embeddings'][:n_paragraphs]
+
+                            yield entry
+                        # remove from memories all the entries once done
+                        del entries
+
+                except Exception as e:
+                    logging.warning(f'Error {e} when processing file={file_path}')
+
+        return cls(_stream(), *args, **kwars)
 
     @classmethod
-    def from_pkl(cls, filepath: Path, n_paragraphs: int = 100, *args, **kwars):
+    def from_pkl(cls, file_path: Path, n_paragraphs: int = 100, *args, **kwars):
         """Fill up elastic search from a single pkl file
         
         :param filepath: Path to a pickle file
         :type filepath: Path
         """
-        with open(filepath, 'rb') as f:
+        
+        with open(file_path, 'rb') as f:
             entries = pickle.load(f)
 
-            logging.info(f'Loading entries from {filepath} ...')
+            logging.info(f'Loading entries from {file_path} ...')
 
             def _stream():
                 for entry in tqdm(entries):
@@ -146,12 +163,11 @@ class ElasticSearchProvider:
 
 
 if __name__ == '__main__':
+    # TODO CL?
     with open('./data/es_index.json', 'r') as f:
         index_file = json.load(f)
 
-        es_providers = ElasticSearchProvider.from_pkls(root=Path('./data'),
+        es_provider = ElasticSearchProvider.from_pkls(root=Path('./data'),
                                                        index_file=index_file,
                                                        n_paragraphs=5)
-        es_providers[0].drop()
-        for i, es_provider in enumerate(es_providers):
-            es_provider()
+        es_provider()

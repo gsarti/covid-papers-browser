@@ -4,6 +4,9 @@ from dataclasses import dataclass
 
 @dataclass
 class Elasticsearcher:
+    """
+    This class implements the logic behind searching for a vector in elastic search.
+    """
     client: Elasticsearch = Elasticsearch()
     index_name: str = 'covid-19'
 
@@ -17,7 +20,7 @@ class Elasticsearcher:
                     "source":
                     "cosineSimilarity(params.query_vector, doc['title_abstract_embeddings']) + 1.0",
                     "params": {
-                        "query_vector": query
+                        "query_vector": vector
                     }
                 }
             }
@@ -29,9 +32,7 @@ class Elasticsearcher:
                 "size": 25,
                 "query": script_query,
                 "_source": {
-                    "includes":
-                    # TODO ask @Gabriele
-                    ["title", "abstract", "authors", "doi"]
+                    "includes": ["title", "abstract"]
                 }
             })
 
