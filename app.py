@@ -11,12 +11,8 @@ from bson.objectid import ObjectId
 from flask_pymongo import PyMongo
 from flask_cors import CORS
 
-sys.path.append(
-    os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir,
-                 'src'))
-warnings.filterwarnings('ignore', category=FutureWarning)
 
-from covid_browser import (load_sentence_transformer, match_query,
+from src.covid_browser import (load_sentence_transformer, match_query,
                            get_relevant_span, PaperOverview, PaperDetails)
 
 parser = argparse.ArgumentParser()
@@ -40,6 +36,13 @@ parser.add_argument(
     type=str, 
     required=False,
     help="Mongo collection name."
+)
+parser.add_argument(
+    "--es-index", 
+    default="covid-19", 
+    type=str, 
+    required=False,
+    help="Elastic Search index name."
 )
 parser.add_argument(
     "--model_name", 

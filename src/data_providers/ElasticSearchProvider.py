@@ -12,6 +12,7 @@ from elasticsearch.helpers import bulk
 logging.basicConfig(level=logging.INFO)
 # Mainly inspired by https://github.com/t0m-R/covid19-search-engine/blob/master/py/create_documents.py
 
+
 @dataclass
 class ElasticSearchProvider:
     """ 
@@ -34,52 +35,68 @@ class ElasticSearchProvider:
     ```
     """
     entries: list()
-    index_file:  dict
+    index_file: dict
     client: Elasticsearch = Elasticsearch()
-    doc: list  = field(default_factory=list)
-    # add index
+    doc: list = field(default_factory=list)
+    index_name: str = 'covid-19'
 
-    def create_documents(self, out_path: Path, index_name: str = 'covid-19'):
+    def create_and_bulk_documents(self, batch_size: int = 128):
+
         for entry in tqdm(self.entries):
-            entry_elastic  = {**entry, **{ '_op_type': 'index', '_index': index_name}}
-            # TODO this can become huge!
+            entry_elastic = {
+                **entry,
+                **{
+                    '_op_type': 'index',
+                    '_index': self.index_name
+                }
+            }
+
             self.doc.append(entry_elastic)
+            should_bulk = len(current_batch) >= batch_size
+            if should_bulk:
+                bulk(self.client)
+                self.doc = []
 
-    def create_index(self, index_path:Path, index_name: str = 'covid-19'):
+    def create_index(self):
         """Fill up elastic search
-        
-        :param index_path: [description]
-        :type index_path: Path
-        :param index_name: [description], defaults to 'covid-19'
-        :type index_name: str, optional
         """
-        # TODO add option to remove
-        self.client.indices.delete(index=index_name, ignore=[404])
-        self.client.indices.create(index=index_name, body=self.index_file) 
+        self.client.indices.create(index=self.index_name, body=self.index_file)
 
+    def load(self, file_path: Path):
+        """Load a file that contains the documents indeces
+      
+      :param file_path: [description]
+      :type file_path: Path
+      """
+        with open(file_path, 'r') as f:
+            self.doc = json.load(f)
 
-    def __call__(self, out_path:Path, index_name: str = 'covid-19'):
+    def drop(self):
+        """Drop the current index
+        """
+        self.client.indices.delete(index=self.index_name, ignore=[404])
+
+    def __call__(self, batch_size: int = 128):
         """In order
 
         - [ ] create all the documents
         - [ ] create a new index from the document
         
-        :param out_path: [description]
-        :type out_path: Path
-        :param index_name: [description], defaults to 'covid-19'
-        :type index_name: str, optional
         """
+        self.drop()
+        logging.info(f'Creating index {self.index_name}...')
+        self.create_index()
+        logging.info(f'Creating documents...')
+        self.create_and_bulk_documents(batch_size)
 
-        self.create_documents(out_path, index_name)
+        return self
 
-        logging.info(f'Creating index from {out_path} with name={index_name}...')
-        self.create_index(out_path, index_name)
-        bulk(self.client, self.doc)
-        # with open(out_path, 'w') as f:
-        #     f.write(json.dumps(self.doc))
+    def save(self, out_path: Path):
+        with open(out_path, 'w') as f:
+            f.write(json.dumps(self.doc))
 
     @classmethod
-    def from_pkls(cls, root: Path, *args, **kwars):
+    def from_pkls(cls, root: Path, _paragraphs: int = 100, *args, **kwars):
         """Fill up elastic search from dir with .pkl files
         :param root: Root of the folder that contains the pickle files
         :type root: Path
@@ -87,12 +104,19 @@ class ElasticSearchProvider:
         filepaths = list(root.glob('**/*.pkl'))
         logging.info(f'Found {len(filepaths)} files in {root}')
 
-        with open(fname, 'rb') as f:
-            entries = pickle.load(f)
-        pass
+        providers = []
+
+        for file_path in filepaths:
+            try:
+                provider = cls.from_pkl(file_path, *args, **kwars)
+                providers.append(provider)
+            except Exception as e:
+                logging.warning(f'Error {e} when processing file={file_path}')
+
+        return providers
 
     @classmethod
-    def from_pkl(cls, filepath: Path, *args, **kwars):
+    def from_pkl(cls, filepath: Path, n_paragraphs: int = 100, *args, **kwars):
         """Fill up elastic search from a single pkl file
         
         :param filepath: Path to a pickle file
@@ -102,69 +126,30 @@ class ElasticSearchProvider:
             entries = pickle.load(f)
 
         logging.info(f'Loading entries from {filepath} ...')
+
         def _stream():
             for entry in tqdm(entries):
                 if 'paragraphs' in entry:
                     # TODO by @Francesco, we can iterate in paragraphs and create subdocuments linked to paragraphs
                     entry['paragraphs'] = entry['paragraphs'][:5]
                     entry['paragraphs_embeddings'] = entry[
-                        'paragraphs_embeddings'][:100]
-                tmp = {'title': entry['title'], 'doi': entry['doi'],  
-                'abstract' : entry['abstract'], 
-                'title_abstract_embeddings': entry['title_abstract_embeddings'],
-                'paragraphs_embeddings': entry['paragraphs_embeddings']
-                 }
-                yield tmp 
+                        'paragraphs_embeddings'][:n_paragraphs]
+
+                yield entry
 
         return cls(_stream(), *args, **kwars)
 
-        
 
+if __name__ == '__main__':
+    with open('./data/es_index.json', 'r') as f:
+        index_file = json.load(f)
 
-# elastic_provider = ElasticSearchProvider.from_pkl(Path('../data/db_entries2.pkl'))
-index_file = {
-  "settings": {
-    "number_of_shards": 2,
-    "number_of_replicas": 1
-  },
-  "mappings": {
-    "dynamic": "true",
-    "_source": {
-      "enabled": "true"
-    },
-    "properties": {
-      "title": {
-        "type": "text"
-      },
-      "abstract": {
-        "type": "text"
-      },
-      "doi": {
-        "type": "text"
-      },
-      "title_abstract_embeddings": {
-        "type": "dense_vector",
-        "dims": 768
-      },
-      "paragraphs_embeddings": []
-    }
-  }
-}
+        es_providers = ElasticSearchProvider.from_pkls(root=Path('./data'),
+                                                       index_file=index_file)
+        for i, es_provider in enumerate(es_providers):
+            es_provider()
+            del es_provider
 
-# embedding dim = 768
-elastic_provider = ElasticSearchProvider.from_pkl(Path('./data/db_entries2.pkl'),  index_file=index_file)
-
-# elastic_provider = ElasticSearchProvider([{
-#     'title' : 'title', 
-#     'abstract': 'foo', 
-#     'doi' : 'asd'}], index_file=index_file)
-
-elastic_provider(out_path=Path('./data/elastic.json'))
-
-# df = pd.read_csv(Path('../data/metadata.csv'), nrows=100)
-
-
-
-# elastic_provider = ElasticSearchProvider(df, [])
-
-# elastic_provider.metafile.info()
+    # # es_provider = ElasticSearchProvider.from_pkl(
+    # #     Path('./data/db_entries2.pkl'), index_file=index_file)
+    # es_provider().save(Path('./data/elastic.json'))
