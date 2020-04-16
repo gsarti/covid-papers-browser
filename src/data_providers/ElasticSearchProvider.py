@@ -12,7 +12,6 @@ from elasticsearch.helpers import bulk
 logging.basicConfig(level=logging.INFO)
 # Mainly inspired by https://github.com/t0m-R/covid19-search-engine/blob/master/py/create_documents.py
 
-
 @dataclass
 class ElasticSearchProvider:
     """ 

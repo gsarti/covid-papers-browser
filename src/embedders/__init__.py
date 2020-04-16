@@ -1,4 +1,5 @@
 import spacy
+from sentence_transformers import SentenceTransformer
 
 class Embedder:
     def process(self, query):
@@ -12,13 +13,13 @@ class Embedder:
         query_emb = self.embed(query_pre)
         return query_emb
 
-
 class TransformerEmbedder(Embedder):
-    def __init__(self, model: SentenceTransformer)
-        nlp = spacy.load("en_core_web_sm")
+    def __init__(self, model: SentenceTransformer):
+        self.nlp = spacy.load("en_core_web_sm")
+        self.model = model
 
     def preprocess(self, query: str):
-        query_pre =  nlp(query)
+        query_pre =  self.nlp(query)
         return query_pre
 
     def embed(self, query: str):
