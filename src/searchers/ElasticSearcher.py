@@ -5,10 +5,9 @@ from dataclasses import dataclass
 @dataclass
 class Elasticsearcher:
     client: Elasticsearch = Elasticsearch()
-    preprocess: callable = lambda x: x
+    index_name: str = 'covid-19'
 
-    def __call__(self, query):
-        query_pre = preprocess(query)
+    def __call__(self, vector: list):
         script_query = {
             "script_score": {
                 "query": {
@@ -18,16 +17,16 @@ class Elasticsearcher:
                     "source":
                     "cosineSimilarity(params.query_vector, doc['title_abstract_embeddings']) + 1.0",
                     "params": {
-                        "query_vector": query_pre
+                        "query_vector": query
                     }
                 }
             }
         }
 
-        response = client.search(
-            index=INDEX_NAME,
+        res = self.client.search(
+            index=self.index_name,
             body={
-                "size": SEARCH_SIZE,
+                "size": 25,
                 "query": script_query,
                 "_source": {
                     "includes":
@@ -36,3 +35,4 @@ class Elasticsearcher:
                 }
             })
 
+        return res
