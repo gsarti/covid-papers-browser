@@ -40,8 +40,32 @@ class ElasticSearchProvider:
     doc: list = field(default_factory=list)
     index_name: str = 'covid-19'
 
-    def create_and_bulk_documents(self, batch_size: int = 128):
+    def load(self, file_path: Path):
+        """Load a file that contains the documents indeces
+      
+      :param file_path: [description]
+      :type file_path: Path
+      """
+        with open(file_path, 'r') as f:
+            self.doc = json.load(f)
 
+    def drop(self):
+        """Drop the current index
+        """
+        self.client.indices.delete(index=self.index_name, ignore=[404])
+
+    def create_index(self):
+        """Fill up elastic search
+        """
+        self.client.indices.create(index=self.index_name, body=self.index_file)
+
+    def create_and_bulk_documents(self, batch_size: int = 128):
+        """Iteratively create and bulk documents to elasticsearch using a batch-wise process.
+        `self.doc` is used to store the batches, so it will always hold the *last batch*
+
+        :param batch_size: [description], defaults to 128
+        :type batch_size: int, optional
+        """
         for entry in tqdm(self.entries):
             entry_elastic = {
                 **entry,
@@ -57,25 +81,6 @@ class ElasticSearchProvider:
                 bulk(self.client)
                 self.doc = []
 
-    def create_index(self):
-        """Fill up elastic search
-        """
-        self.client.indices.create(index=self.index_name, body=self.index_file)
-
-    def load(self, file_path: Path):
-        """Load a file that contains the documents indeces
-      
-      :param file_path: [description]
-      :type file_path: Path
-      """
-        with open(file_path, 'r') as f:
-            self.doc = json.load(f)
-
-    def drop(self):
-        """Drop the current index
-        """
-        self.client.indices.delete(index=self.index_name, ignore=[404])
-
     def __call__(self, batch_size: int = 128):
         """In order
 
@@ -83,7 +88,6 @@ class ElasticSearchProvider:
         - [ ] create a new index from the document
         
         """
-        self.drop()
         logging.info(f'Creating index {self.index_name}...')
         self.create_index()
         logging.info(f'Creating documents...')
@@ -96,7 +100,7 @@ class ElasticSearchProvider:
             f.write(json.dumps(self.doc))
 
     @classmethod
-    def from_pkls(cls, root: Path, _paragraphs: int = 100, *args, **kwars):
+    def from_pkls(cls, root: Path, *args, **kwars):
         """Fill up elastic search from dir with .pkl files
         :param root: Root of the folder that contains the pickle files
         :type root: Path
@@ -125,7 +129,7 @@ class ElasticSearchProvider:
         with open(filepath, 'rb') as f:
             entries = pickle.load(f)
 
-        logging.info(f'Loading entries from {filepath} ...')
+            logging.info(f'Loading entries from {filepath} ...')
 
         def _stream():
             for entry in tqdm(entries):
@@ -136,6 +140,8 @@ class ElasticSearchProvider:
                         'paragraphs_embeddings'][:n_paragraphs]
 
                 yield entry
+            # remove from memories all the entries once done
+            del entries
 
         return cls(_stream(), *args, **kwars)
 
@@ -145,11 +151,8 @@ if __name__ == '__main__':
         index_file = json.load(f)
 
         es_providers = ElasticSearchProvider.from_pkls(root=Path('./data'),
-                                                       index_file=index_file)
+                                                       index_file=index_file,
+                                                       n_paragraphs=5)
+        es_providers[0].drop()
         for i, es_provider in enumerate(es_providers):
             es_provider()
-            del es_provider
-
-    # # es_provider = ElasticSearchProvider.from_pkl(
-    # #     Path('./data/db_entries2.pkl'), index_file=index_file)
-    # es_provider().save(Path('./data/elastic.json'))
