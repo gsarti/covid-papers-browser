@@ -131,17 +131,17 @@ class ElasticSearchProvider:
 
             logging.info(f'Loading entries from {filepath} ...')
 
-        def _stream():
-            for entry in tqdm(entries):
-                if 'paragraphs' in entry:
-                    # TODO by @Francesco, we can iterate in paragraphs and create subdocuments linked to paragraphs
-                    entry['paragraphs'] = entry['paragraphs'][:5]
-                    entry['paragraphs_embeddings'] = entry[
-                        'paragraphs_embeddings'][:n_paragraphs]
+            def _stream():
+                for entry in tqdm(entries):
+                    if 'paragraphs' in entry:
+                        # TODO by @Francesco, we can iterate in paragraphs and create subdocuments linked to paragraphs
+                        entry['paragraphs'] = entry['paragraphs'][:n_paragraphs]
+                        entry['paragraphs_embeddings'] = entry[
+                            'paragraphs_embeddings'][:n_paragraphs]
 
-                yield entry
-            # remove from memories all the entries once done
-            del entries
+                    yield entry
+                # remove from memories all the entries once done
+                del entries
 
         return cls(_stream(), *args, **kwars)
 
