@@ -3,8 +3,10 @@
 }
 
 #banner {
-    background-color: #009246;
-    min-height: 80px;
+    /* background-color: #1E57A8; */
+    background-image: url("../img/covid19browser.png");
+    background-size: cover;
+    min-height: 150px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -14,6 +16,7 @@
     color: white;
     margin-top: 0px;
     margin-bottom: 0px;
+    text-shadow: 1px 1px 5px rgb(97, 97, 97);
 }
 
 #icon {
@@ -98,35 +101,34 @@
 
 h2 {
     padding-bottom: 10px !important; 
-    color: #009246;
-
+    color: #1E57A8;
 }
 h3.author{
 display:inline;
 }
 a,a:hover{
 
-    color:#009246;
+    color:#1E57A8;
 }
 a:visited{
 
-    color:#005f2e;
+    color:#1E57A8;
 
 }
 .nav-link:hover{
-    color:#009246;
+    color:#1E57A8;
 
 
 }
 
 .pagination>li>a{
-    border-color: #009246;
-    color: #009246;
+    border-color: #1E57A8;
+    color: #1E57A8;
 
 }
 .pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus {
-    border-color: #009246;
-    background-color: #009246;
+    border-color: #1E57A8;
+    background-color: #1E57A8;
 
 }
 
@@ -144,8 +146,8 @@ a:visited{
 }
 .form-submit-button {
 
-    background: #009246;
-    border-color:  #009246 !important;
+    background: #1E57A8;
+    border-color:  #1E57A8 !important;
 
     color: white;
     
@@ -193,24 +195,24 @@ th {
 
 .btn-primary, .btn-primary:hover
 {   color: white;
-    background-color: #009246;
-    border-color: #009246;
+    background-color: #1E57A8;
+    border-color: #1E57A8;
 
 }
 .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary,.btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show>.btn-primary.dropdown-toggle
 {   color: white;
-    background-color: #009246;
-    border-color: #009246;
+    background-color: #1E57A8;
+    border-color: #1E57A8;
 
 }
 .check-mark{
-    color: #009246;
+    color: #1E57A8;
 
 }
 
 span.paragraph{
 
-    background-color:#abdca4;
+    background-color:rgb(177, 210, 255);
 }
 
 #submit-remove-filters{
@@ -237,6 +239,6 @@ min-height: fit-content !important;
 #footer {
     display: flex;
     align-content: flex-end;
-    margin-top:30px;
+    margin-top:40px;
     margin-bottom:60px;
 }
