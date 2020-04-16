@@ -4,15 +4,24 @@ services:
         build: .
         environment:
             FLASK_ENV: production
-            MONGO_URI: 'mongodb://mongo:27017/covid'
+            #MONGO_URI: 'mongodb://mongo:27017/covid'
             # MONGO_URI: 'mongodb://0.0.0.0:27017/covid'
         ports:
             - "5000:5000"
-        links:
-            - mongo 
-    mongo:
-        image: mongo
-        # volumes:
-        #     - .mongo:/data/db
+        depends_on:
+            - elasticsearch
+
+    elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.3.2
         ports:
-            - "27017:27017"
+            - "9200:9200"
+        volumes:
+            - elastic:/usr/share/elasticsearch/data
+        tty: true
+        environment:
+            discovery.type: single-node
+
+    volumes:
+        elastic:
+            driver: local
+
