@@ -8,7 +8,6 @@ from nltk.tokenize import sent_tokenize
 from sentence_transformers import models, SentenceTransformer
 from .paper import PaperDatabaseEntryDetails, PaperDatabaseEntryOverview
 
-MAX_SIZE = 16793600 # Max BSONObject size
 MAX_PARAGRAPH_COUNT = 100 # Max # of paragraphs per section
 
 def load_sentence_transformer(
@@ -17,7 +16,7 @@ def load_sentence_transformer(
     do_lower_case: bool  = True) -> SentenceTransformer:
     """ Loads a SentenceTransformer from HuggingFace AutoModel bestiary """
     word_embedding_model = models.BERT(
-            'gsarti/scibert-nli',
+            'gsarti/biobert-nli',
             max_seq_length=128,
             do_lower_case=True
         )
@@ -52,10 +51,13 @@ def create_db_entry(
     """ Creates a single DB entry of specified type from a csv entry using the model"""
     db_entry = data_type(csv_entry)
     db_entry.compute_title_abstract_embeddings(model)
-    if csv_entry['has_full_text'] == True and data_type == PaperDatabaseEntryDetails:
+    if (csv_entry['has_pdf_parse'] == True
+        and data_type == PaperDatabaseEntryDetails
+        and db_entry.abstract != ''):
+
         foldername = csv_entry['full_text_file']
         # Format is e.g. 'data/biorxiv_medrxiv/biorxiv_medrxiv/file.json'
-        path = os.path.join(data_path, foldername, foldername, f'{db_entry.sha}.json')
+        path = os.path.join(data_path, foldername, 'pdf_json', f'{db_entry.sha}.json')
         file = json.load(open(path, 'r'))
         paragraphs = []
         # Order is: abstracts, body, back_matter, ref_entries

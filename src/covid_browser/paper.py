@@ -27,7 +27,8 @@ class PaperDatabaseEntryOverview:
         }
 
     def compute_title_abstract_embeddings(self, model):
-        if self.title != '' or self.abstract != '':
+        # We compute embeddings only for papers with abstracts available.
+        if self.abstract != '':
             title_abstract = self.title + ' ' + self.abstract
             embedding = model.encode([title_abstract], show_progress_bar=False)
             self.title_abstract_embeddings = embedding[0].tolist()
