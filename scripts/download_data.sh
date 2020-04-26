@@ -1,6 +1,6 @@
 # Downloads latest available data from AI2's servers.
 
-DATE=2020-03-27
+DATE=2020-04-24
 DATA_DIR=data
 
 wget https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/"${DATE}"/comm_use_subset.tar.gz -P "${DATA_DIR}"
