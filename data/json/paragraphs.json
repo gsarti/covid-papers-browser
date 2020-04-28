@@ -1,0 +1,30 @@
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "dynamic": "true",
+    "_source": {
+      "enabled": "true"
+    },
+    "properties": {
+      "cord_id": {
+        "type": "text"
+      },
+      "n_par": {
+        "type": "integer"
+      },
+      "par_title": {
+        "type": "text"
+      },
+      "paragraph": {
+        "type": "text"
+      },
+      "paragraph_embeddings": {
+        "type": "dense_vector",
+        "dims": 768
+      }
+    }
+  }
+}

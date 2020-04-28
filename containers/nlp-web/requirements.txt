@@ -1,0 +1,7 @@
+bert-serving-client==1.10.0
+elasticsearch==7.0.4
+Flask==1.1.1
+nltk==3.4.5
+spacy==2.2.3
+flask_cors
+gunicorn

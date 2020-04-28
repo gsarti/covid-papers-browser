@@ -1,0 +1,52 @@
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "dynamic": "true",
+    "_source": {
+      "enabled": "true"
+    },
+    "properties": {
+      "cord_id": {
+        "type": "text"
+      },
+      "title": {
+        "type": "text"
+      },
+      "abstract": {
+        "type": "text"
+      },
+      "authors": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "journal": {
+        "type": "keyword"
+      },
+      "doi":{
+        "type": "text"
+      },
+      "publish_time": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      },
+      "license": {
+        "type": "keyword"
+      },
+      "title_abstract_embeddings": {
+        "type": "dense_vector",
+        "dims": 768
+      }
+    }
+  }
+}

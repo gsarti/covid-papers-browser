@@ -1,0 +1,5 @@
+wget
+tensorboard==2.1.0
+tensorflow
+torch
+transformers

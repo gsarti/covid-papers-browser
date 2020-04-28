@@ -1,0 +1,66 @@
+version: '2.4'
+services:
+
+  nginx:
+    image: nginx
+    ports:
+      - "8888:8888"
+    depends_on:
+     - nlp-bert
+    volumes:
+     - ./nginx/dashboard:/usr/share/nginx/html
+     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+
+  nginx-flask:
+    image: nginx
+    ports:
+      - "80:80"
+    depends_on:
+     - nlp-web
+    links:
+     - nlp-web
+    volumes:
+     - ./nlp-web/templates/frontend/:/usr/share/nginx/html
+     - ./nlp-web/nginx.conf:/etc/nginx/nginx.conf
+
+
+  nlp-web:
+    build: ./nlp-web
+    ports:
+      - "5000:5000"
+    environment:
+      - INDEX_NAME
+    depends_on:
+      - nlp-elasticsearch
+      - nlp-bert
+
+  nlp-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.2
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    tty: true
+    environment:
+      discovery.type: single-node
+
+  nlp-bert:
+    build: ./nlp-bert
+#    runtime: nvidia
+    environment:
+    ports:
+      - "8001:8001"
+      - "5555:5555"
+      - "5556:5556"
+    environment:
+      - PATH_MODEL=${PATH_MODEL}
+#      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - "${PATH_MODEL}:/model"
+
+volumes:
+  es-data:
+    driver: local
+
+
+
