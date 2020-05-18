@@ -29,6 +29,7 @@ def get_args_from_command_line():
     """Parse the command line arguments."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, default='scibert')
+    parser.add_argument("--batch_size", type=int, default=64)
     args = parser.parse_args()
     return args
 
@@ -37,7 +38,7 @@ args = get_args_from_command_line()
 
 # Read the dataset
 model_name = 'models/' + args.model
-batch_size = 64
+batch_size = args.batch_size
 nli_reader = NLIDataReader('data/AllNLI')
 sts_reader = STSDataReader('data/stsbenchmark')
 train_num_labels = nli_reader.get_num_labels()
