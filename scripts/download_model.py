@@ -10,6 +10,8 @@ MODELS_PRETRAINED = {
     'scibert': 'allenai/scibert_scivocab_cased',
     'biobert': 'monologg/biobert_v1.1_pubmed',
     'covidbert': ' deepset/covid_bert_base',
+    'clinicalcovidbert': 'mananeau/clinicalcovid-bert-base-cased',
+    'biocovidbert': 'mananeau/biocovid-bert-large-cased'
 }
 
 MODELS_FINETUNED = {
