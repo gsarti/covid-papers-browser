@@ -16,6 +16,7 @@ from sentence_transformers.evaluation import EmbeddingSimilarityEvaluator
 from sentence_transformers.readers import *
 import logging
 from datetime import datetime
+import argparse
 
 #### Just some code to print debug information to stdout
 logging.basicConfig(format='%(asctime)s - %(message)s',
@@ -24,13 +25,23 @@ logging.basicConfig(format='%(asctime)s - %(message)s',
                     handlers=[LoggingHandler()])
 #### /print debug information to stdout
 
+def get_args_from_command_line():
+    """Parse the command line arguments."""
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model_name", type=str, default='scibert')
+    args = parser.parse_args()
+    return args
+
+
+args = get_args_from_command_line()
+
 # Read the dataset
-model_name = 'models/scibert'
+model_name = 'models/' + args.model_name
 batch_size = 64
 nli_reader = NLIDataReader('data/AllNLI')
 sts_reader = STSDataReader('data/stsbenchmark')
 train_num_labels = nli_reader.get_num_labels()
-model_save_path = 'models/scibert_nli'
+model_save_path = model_name + '_nli'
 
 
 
