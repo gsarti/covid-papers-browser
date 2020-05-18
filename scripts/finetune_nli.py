@@ -28,7 +28,7 @@ logging.basicConfig(format='%(asctime)s - %(message)s',
 def get_args_from_command_line():
     """Parse the command line arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_name", type=str, default='scibert')
+    parser.add_argument("--model", type=str, default='scibert')
     args = parser.parse_args()
     return args
 
@@ -36,7 +36,7 @@ def get_args_from_command_line():
 args = get_args_from_command_line()
 
 # Read the dataset
-model_name = 'models/' + args.model_name
+model_name = 'models/' + args.model
 batch_size = 64
 nli_reader = NLIDataReader('data/AllNLI')
 sts_reader = STSDataReader('data/stsbenchmark')
