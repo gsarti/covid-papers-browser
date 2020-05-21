@@ -46,8 +46,13 @@ if __name__ == "__main__":
         required=False,
         help="Sequence length used by the language model."
     )
+    parser.add_argument(
+        "--output_dir",  
+        type=str,
+        help="Directory where the models are saved."
+    )    
     args = parser.parse_args()
-    path = os.path.join(MODELS_PATH, args.model)
+    path = os.path.join(args.output_dir, MODELS_PATH, args.model)
     if not os.path.exists(path):
         os.makedirs(path)
     if args.model not in list(MODELS_PRETRAINED) + list(MODELS_FINETUNED):
