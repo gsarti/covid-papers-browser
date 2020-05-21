@@ -17,6 +17,7 @@ from sentence_transformers.readers import *
 import logging
 from datetime import datetime
 import argparse
+import os
 
 #### Just some code to print debug information to stdout
 logging.basicConfig(format='%(asctime)s - %(message)s',
@@ -30,6 +31,7 @@ def get_args_from_command_line():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, default='scibert')
     parser.add_argument("--batch_size", type=int, default=64)
+    parser.add_argument("--output_dir", type=str,default="")
     args = parser.parse_args()
     return args
 
@@ -37,7 +39,7 @@ def get_args_from_command_line():
 args = get_args_from_command_line()
 
 # Read the dataset
-model_name = 'models/' + args.model
+model_name = os.path.join(args.output_dir,'models', args.model)
 batch_size = args.batch_size
 nli_reader = NLIDataReader('data/AllNLI')
 sts_reader = STSDataReader('data/stsbenchmark')
