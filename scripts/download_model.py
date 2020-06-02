@@ -11,7 +11,8 @@ MODELS_PRETRAINED = {
     'biobert': 'monologg/biobert_v1.1_pubmed',
     'covidbert': ' deepset/covid_bert_base',
     'clinicalcovidbert': 'mananeau/clinicalcovid-bert-base-cased',
-    'biocovidbert': 'mananeau/biocovid-bert-large-cased'
+    'biocovidbert': 'mananeau/biocovid-bert-large-cased',
+    'conversationalbert': 'DeepPavlov/bert-base-cased-conversational'
 }
 
 MODELS_FINETUNED = {
