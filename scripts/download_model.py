@@ -10,8 +10,8 @@ MODELS_PRETRAINED = {
     'scibert': 'allenai/scibert_scivocab_cased',
     'biobert': 'monologg/biobert_v1.1_pubmed',
     'covidbert': ' deepset/covid_bert_base',
-    'clinicalcovidbert': 'mananeau/clinicalcovid-bert-base-cased',
-    'biocovidbert': 'mananeau/biocovid-bert-large-cased',
+    'clinicalcovidbert': 'manueltonneau/clinicalcovid-bert-base-cased',
+    'biocovidbert': 'manueltonneau/biocovid-bert-large-cased',
     'conversationalbert': 'DeepPavlov/bert-base-cased-conversational'
 }
 
@@ -19,7 +19,7 @@ MODELS_FINETUNED = {
     'scibert-nli': 'gsarti/scibert-nli',
     'biobert-nli': 'gsarti/biobert-nli',
     'covidbert-nli': 'gsarti/covidbert-nli',
-    'clinicalcovidbert-nli':'mananeau/clinicalcovid-bert-nli'
+    'clinicalcovidbert-nli':'manueltonneau/clinicalcovid-bert-nli'
 }
 
 MODELS = {**MODELS_PRETRAINED, **MODELS_FINETUNED}
