@@ -10,12 +10,14 @@ MODELS_PRETRAINED = {
     'scibert': 'allenai/scibert_scivocab_cased',
     'biobert': 'monologg/biobert_v1.1_pubmed',
     'covidbert': ' deepset/covid_bert_base',
-}
+    'clinicalcovidbert': 'manueltonneau/clinicalcovid-bert-base-cased',
+    'biocovidbert': 'manueltonneau/biocovid-bert-large-cased'}
 
 MODELS_FINETUNED = {
     'scibert-nli': 'gsarti/scibert-nli',
     'biobert-nli': 'gsarti/biobert-nli',
-    'covidbert-nli': 'gsarti/covidbert-nli'
+    'covidbert-nli': 'gsarti/covidbert-nli',
+    'clinicalcovidbert-nli':'manueltonneau/clinicalcovid-bert-nli'
 }
 
 MODELS = {**MODELS_PRETRAINED, **MODELS_FINETUNED}
@@ -43,8 +45,13 @@ if __name__ == "__main__":
         required=False,
         help="Sequence length used by the language model."
     )
+    parser.add_argument(
+        "--output_dir",  
+        type=str,
+        help="Directory where the models are saved."
+    )    
     args = parser.parse_args()
-    path = os.path.join(MODELS_PATH, args.model)
+    path = os.path.join(args.output_dir, MODELS_PATH, args.model)
     if not os.path.exists(path):
         os.makedirs(path)
     if args.model not in list(MODELS_PRETRAINED) + list(MODELS_FINETUNED):
