@@ -10,7 +10,7 @@ Various models already fine-tuned on Natural Language Inference are available to
 
 - **[`covidbert-nli`](https://huggingface.co/gsarti/covidbert-nli)**, a fine-tuned version of Deepset's [CovidBERT](https://huggingface.co/deepset/covid_bert_base).
 
-- **[`clinicalcovid-nli`](https://huggingface.co/manueltonneau/clinicalcovid-nli)**, a fine-tuned version of [@manueltonneau](https://github.com/manueltonneau)'s [ClinicalCovidBERT](https://github.com/manueltonneau/covid-berts).
+- **[`clinicalcovid-bert-nli`](https://huggingface.co/manueltonneau/clinicalcovid-bert-nli)**, a fine-tuned version of [@manueltonneau](https://github.com/manueltonneau)'s [ClinicalCovidBERT](https://github.com/manueltonneau/covid-berts).
 
 All models are trained on [SNLI](https://nlp.stanford.edu/projects/snli/) [3] and [MultiNLI](https://www.nyu.edu/projects/bowman/multinli/) [4] using the [`sentence-transformers` library](https://github.com/UKPLab/sentence-transformers/) [5] to produce universal sentence embeddings [6]. Embeddings are subsequently used to perform semantic search on CORD-19.
 
