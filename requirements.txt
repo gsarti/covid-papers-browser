@@ -7,7 +7,7 @@ pymongo==3.10.1
 Flask==1.1.1
 tqdm==4.42.0
 Flask_PyMongo==2.3.0
-Flask_Cors==3.0.8
+Flask_Cors==3.0.9
 pandas==0.25.3
 prettytable==0.7.2
 scipy==1.4.1
